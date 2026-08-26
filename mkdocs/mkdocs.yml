@@ -11,5 +11,5 @@ nav:
     - Filesystem: filesystem.md
     - Networking: networking.md
     - Backups:
-        - Backups: backyps/backups.md
-        - Immich: backyps/backups-immich.md
+        - Backups: backups/backups.md
+        - Immich: backups/backups-immich.md
