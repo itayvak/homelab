@@ -44,3 +44,7 @@ vpn.itayvak.com {
 boards.itayvak.com {
     reverse_proxy planka:1337
 }
+
+docs.itayvak.com {
+    reverse_proxy mkdocs:80
+}
