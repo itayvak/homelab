@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>You Are Gay</title>
+    <style>
+        /* Force the body to take up the whole screen and center everything */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            /* The background also flashes to create the high-contrast effect */
+            animation: flash-bg 0.7s infinite;
+        }
+
+        h1 {
+            font-size: 6vw; /* Scales with screen width */
+            text-transform: uppercase;
+            margin: 0;
+            padding: 20px;
+            user-select: none;
+            /* The text flashes opposite to the background */
+            animation: flash-text 0.7s infinite;
+        }
+
+        /* Logic: When bg is black, text is white. When bg is white, text is black. */
+        @keyframes flash-bg {
+            0% { background-color: black; }
+            50% { background-color: black; }
+            51% { background-color: white; }
+            100% { background-color: white; }
+        }
+
+        @keyframes flash-text {
+            0% { color: white; }
+            50% { color: white; }
+            51% { color: black; }
+            100% { color: black; }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>YOU ARE GAY</h1>
+
+</body>
+</html>

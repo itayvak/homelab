@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  siyuan:
+    image: b3log/siyuan
+    container_name: siyuan
+    command: ['--workspace=/siyuan/workspace/', '--accessAuthCode=${ACCESS_CODE}']
+    volumes:
+      - /apps/data/siyuan:/siyuan/workspace
+    restart: unless-stopped
+    environment:
+      # A list of time zone identifiers can be found at https://en.wikipedia.org/wiki/List_of_tz_database_time_zones
+      - TZ=Asia/Tel_Aviv
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

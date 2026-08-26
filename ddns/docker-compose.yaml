@@ -1,0 +1,10 @@
+services:
+  ddns:
+    image: oznu/cloudflare-ddns:latest
+    container_name: ddns
+    restart: unless-stopped
+    environment:
+      - API_KEY=${API_KEY}
+      - ZONE=itayvak.com
+      - SUBDOMAIN=*
+      - PROXIED=true

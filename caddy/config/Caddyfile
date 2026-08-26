@@ -1,0 +1,46 @@
+# joke website; nothing secret
+secret.itayvak.com {
+    reverse_proxy youaregay:80
+}
+
+# Dynamic route for testing new apps
+# Comment/Uncomment this based on usage
+#testing.itayvak.com {
+#    reverse_proxy ...
+#}
+
+notes.itayvak.com {
+    reverse_proxy siyuan:6806
+}
+
+photos.itayvak.com {
+    reverse_proxy immich_server:2283 {
+        # Increase HTTP timeout for large file uploads
+        transport http {
+            read_timeout 600s
+            write_timeout 600s
+            dial_timeout 30s
+        }
+    }
+
+    request_body {
+        # Remove max body restriction for large files
+        max_size 0
+    }
+}
+
+passwords.itayvak.com {
+    reverse_proxy vaultwarden:80
+}
+
+ci.itayvak.com {
+    reverse_proxy drone:80
+}
+
+vpn.itayvak.com {
+    reverse_proxy headscale:8080
+}
+
+boards.itayvak.com {
+    reverse_proxy planka:1337
+}

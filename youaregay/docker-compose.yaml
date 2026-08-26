@@ -1,0 +1,11 @@
+services:
+  youaregay:
+    build: .
+    container_name: youaregay
+    restart: unless-stopped
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

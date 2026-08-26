@@ -1,0 +1,15 @@
+services:
+  vaultwarden:
+    image: vaultwarden/server:latest
+    container_name: vaultwarden
+    restart: unless-stopped
+    environment:
+      DOMAIN: "https://vw.domain.tld"
+    volumes:
+      - /apps/data/vaultwarden/:/data/
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
