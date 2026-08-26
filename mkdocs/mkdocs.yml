@@ -1,0 +1,12 @@
+site_name: Itayvak Homelab Docs
+site_url: https://docs.itayvak.com\
+
+theme:
+    name: material
+
+nav:
+    - Home: index.md
+    - Networking: networking.md
+    - Backups:
+        - General: backups.md
+        - Immich: backups-immich.md
