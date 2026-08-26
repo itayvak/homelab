@@ -1,6 +1,8 @@
 services:
   mkdocs:
-    build: .
+    build: 
+      context: ..
+      dockerfile: mkdocs/Dockerfile
     container_name: mkdocs
     restart: unless-stopped
     networks:

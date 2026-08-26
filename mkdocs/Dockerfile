@@ -3,7 +3,7 @@ FROM squidfunk/mkdocs-material:9 AS builder
 
 WORKDIR /docs
 
-COPY ../.docs .
+COPY .docs .
 
 RUN mkdocs build --strict
 
