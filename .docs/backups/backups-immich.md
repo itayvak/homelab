@@ -2,7 +2,7 @@
 
 # Database backup solution
 
-Because Immich's database and media are separate components, we use two backup mechanisms: Immich's built-in database backup for the database, and Borg for the media files.
+Since Immich's database and media are separate components, we use two backup mechanisms: Immich's built-in database backup for the database, and Borg for the media files.
 
 For the database, we use the built-in backup functionality in Immich.
 

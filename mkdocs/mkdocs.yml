@@ -1,12 +1,15 @@
 site_name: Itayvak Homelab Docs
-site_url: https://docs.itayvak.com\
+site_url: https://docs.itayvak.com
+repo_url: https://github.com/itayvak/homelab
 
 theme:
     name: material
 
 nav:
     - Home: index.md
+    - Services: services.md
+    - Filesystem: filesystem.md
     - Networking: networking.md
     - Backups:
-        - General: backups.md
-        - Immich: backups-immich.md
+        - Backups: backyps/backups.md
+        - Immich: backyps/backups-immich.md
