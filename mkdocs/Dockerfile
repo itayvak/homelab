@@ -1,10 +1,10 @@
 # Stage 1: Build the docs
 FROM squidfunk/mkdocs-material:9 AS builder
 
-WORKDIR /docs
+WORKDIR /app
 
 COPY mkdocs/mkdocs.yml ./mkdocs.yml
-COPY .docs .
+COPY .docs ./docs
 
 RUN mkdocs build --strict
 
