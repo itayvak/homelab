@@ -7,8 +7,12 @@ services:
       - /apps/data/planka/app-data:/app/data
     environment:
       - BASE_URL=https://boards.itayvak.com
-      - DATABASE_URL=postgresql://postgres@planka_postgres/planka
+      - DATABASE_URL=postgresql://postgres@postgres/planka
       - SECRET_KEY=${SECRET_KEY}
+      - DEFAULT_ADMIN_EMAIL=demo@demo.demo
+      - DEFAULT_ADMIN_USERNAME=demo
+      - DEFAULT_ADMIN_NAME=Demo Demo
+      - DEFAULT_ADMIN_PASSWORD=demo
     depends_on:
       postgres:
         condition: service_healthy

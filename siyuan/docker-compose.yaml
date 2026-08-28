@@ -1,9 +1,8 @@
-version: "3.9"
 services:
   siyuan:
-    image: b3log/siyuan
+    image: b3log/siyuan:v3.8.0
     container_name: siyuan
-    command: ['--workspace=/siyuan/workspace/', '--accessAuthCode=${ACCESS_CODE}']
+    command: ['serve', '--workspace=/siyuan/workspace/', '--accessAuthCode=${ACCESS_CODE}']
     volumes:
       - /apps/data/siyuan:/siyuan/workspace
     restart: unless-stopped
