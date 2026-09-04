@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# ===========================================================================
+# create-backup-borg.sh
+# A helper script that creates a Borg archive, prunes and compacts the repository.
+#
+# Usage:
+#   create-backup-borg <borg-repository> <source-directory>
+# ===========================================================================
+
 # Exit immediately if any command fails
 set -e
 # Treat unset variables as errors
