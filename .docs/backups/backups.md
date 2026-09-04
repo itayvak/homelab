@@ -6,13 +6,13 @@ I use Borg as the backup system.
 
 These are the repos I currently have:
 
-| Service Name | Repository Directory | Source Directory | Notes                                        |
-| -------------- | ---------------------- | ------------------ | ---------------------------------------------- |
-| Immich       | `/apps/storage/backups/immich/borg`                     | `/apps/storage/media/immich`                 | This backup is a bit complicated.<br />See more ((20260822175551-n3b5tik "here")) |
-| Vaultwarden  | `/apps/storage/backups/vaultwarden/borg`                     | `/apps/data/vaultwarden`                 |                                              |
+
+| Service Name | Repository Directory                | Source Directory             | Notes                                                                             |
+| ------------ | ----------------------------------- | ---------------------------- | --------------------------------------------------------------------------------- |
+| Immich       | `/apps/storage/backups/immich`      | `/apps/storage/media/immich` | This backup is a bit complicated.<br />See more ((20260822175551-n3b5tik "here")) |
+| Vaultwarden  | `/apps/storage/backups/vaultwarden` | `/apps/data/vaultwarden`     |                                                                                   |
 
 The backups currently get stored on the same drive as the data, which is not usefull for disaster recovery, but I plan to add an offsite backup server.
-
 
 # Creating a repository
 
@@ -29,7 +29,7 @@ borg init --encryption=repokey-blake2 <REPO_DIR>
 
 Then, you will be prompted to enter a passphrase. For consistency, enter the passphrase found at `/apps/secrets/borg-passphrase`. This will also generate a key for the repository.
 
-> [!IMPORTANT]
+> Important!\
 > We need both key and passphrase to access the data in the repository - so I save the keys to Borg repos in [my Bitwarden](https://passwords.itayvak.com). To view the key you can run:
 >
 > ```bash
@@ -37,7 +37,6 @@ Then, you will be prompted to enter a passphrase. For consistency, enter the pas
 > ```
 >
 > And then copy it into a new note in Bitwarden.
-
 
 # Creating a backup archive
 
@@ -56,7 +55,6 @@ The retention policy for archives is:
 - 7 daily archives
 - 3 weekly archives
 - 3 monthly archives
-
 
 # Restoring a backup
 
@@ -81,7 +79,7 @@ docker-compose down
 
 Then, we delete the current source directory to make room for the restored data.
 
-> [!CAUTION]
+> Caution!\
 > This is highly destructive. Proceed with caution and make absolutely sure you are deleting the correct directory.
 
 ```bash
