@@ -2,6 +2,7 @@
 
 # ===========================================================================
 # create-backup-borg.sh
+#
 # A helper script that creates a Borg archive, prunes and compacts the repository.
 #
 # Usage:
