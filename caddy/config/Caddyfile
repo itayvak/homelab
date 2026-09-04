@@ -16,6 +16,7 @@ notes.itayvak.com {
 photos.itayvak.com {
     reverse_proxy immich_server:2283 {
         # Increase HTTP timeout for large file uploads
+	# I later found out the limit is on cloudflare's end. So this is probably useless.
         transport http {
             read_timeout 600s
             write_timeout 600s
