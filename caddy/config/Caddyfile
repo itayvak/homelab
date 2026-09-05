@@ -51,5 +51,5 @@ docs.itayvak.com {
 }
 
 pet-tagger.itayvak.com {
-    reverse_proxy immich_pet_tagger:2287
+    reverse_proxy immich_pet_tagger:8000
 }
