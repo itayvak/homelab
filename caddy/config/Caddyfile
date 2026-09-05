@@ -49,3 +49,7 @@ boards.itayvak.com {
 docs.itayvak.com {
     reverse_proxy mkdocs:80
 }
+
+pet-tagger.itayvak.com {
+    reverse_proxy immich_pet_tagger:2287
+}
