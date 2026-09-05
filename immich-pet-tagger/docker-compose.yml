@@ -1,0 +1,12 @@
+services:
+  immich_pet_tagger:
+    image: ghcr.io/tedornitier/immich-pet-tagger:latest
+    container_name: immich_pet_tagger
+    restart: unless-stopped
+    env_file: .env
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true
