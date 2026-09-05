@@ -50,6 +50,6 @@ docs.itayvak.com {
     reverse_proxy mkdocs:80
 }
 
-pet-tagger.itayvak.com {
-    reverse_proxy immich_pet_tagger:8000
+stats.itayvak.com {
+    reverse_proxy beszel:8090
 }
