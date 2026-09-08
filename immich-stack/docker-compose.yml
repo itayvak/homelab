@@ -1,0 +1,14 @@
+services:
+  immich_stack:
+    image: ghcr.io/majorfi/immich-stack:latest
+    container_name: immich_stack
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

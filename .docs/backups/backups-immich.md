@@ -35,7 +35,7 @@ The two backup processes are intentionally scheduled five minutes apart: the dat
 
 This ensures that the database backup created at 2:55 AM is included in the Borg archive created at 3:00 AM.
 
-> [!IMPORTANT]
+> Important!\
 > The database backup must finish before the Borg job starts. If the database backup takes longer than five minutes, Borg could start before the new database backup has been created, resulting in the Borg archive containing the previous database backup instead.
 
 For that reason, the database backup duration should be monitored if the Immich library becomes significantly larger.
