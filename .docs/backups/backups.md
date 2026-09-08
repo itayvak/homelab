@@ -8,8 +8,8 @@ These are the repos I currently have:
 
 | Service Name | Repository Directory | Source Directory | Notes                                        |
 | -------------- | ---------------------- | ------------------ | ---------------------------------------------- |
-| Immich       | `/apps/storage/backups/immich/borg`                     | `/apps/storage/media/immich`                 | This backup is a bit complicated.<br />See more ((20260822175551-n3b5tik "here")) |
-| Vaultwarden  | `/apps/storage/backups/vaultwarden/borg`                     | `/apps/data/vaultwarden`                 |                                              |
+| Immich       | `/apps/storage/backups/immich`                     | `/apps/storage/media/immich`                 | This backup is a bit complicated.<br />See more ((20260822175551-n3b5tik "here")) |
+| Vaultwarden  | `/apps/storage/backups/vaultwarden`                     | `/apps/data/vaultwarden`                 |                                              |
 
 The backups currently get stored on the same drive as the data, which is not usefull for disaster recovery, but I plan to add an offsite backup server.
 
@@ -18,7 +18,7 @@ The backups currently get stored on the same drive as the data, which is not use
 
 If you want to start backing up a new directory, you must create a Borg repository for it first.
 
-Borg repositories on the homelab are generally saved at `/apps/storage/backups/<SERVICE_NAME>/borg`.
+Borg repositories on the homelab are generally saved at `/apps/storage/backups/<SERVICE_NAME>`.
 
 You can create one using the Borg init command:
 

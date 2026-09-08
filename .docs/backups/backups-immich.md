@@ -18,7 +18,7 @@ For the media files, we use Borg.
 
 A cron job runs `/apps/scripts/create-backup-borg.sh` every day at 3:00 AM. The script creates a new Borg archive and also handles pruning old archives and compacting the repository.
 
-On the homelab, the Borg repository is located at `/apps/storage/backups/immich/borg`.
+On the homelab, the Borg repository is located at `/apps/storage/backups/immich`.
 
 Because the Immich database backup directory is located inside the media directory, Borg backs up the database backup alongside the media.
 
@@ -93,7 +93,7 @@ cd /
 To restore a snapshot, we first need to find the name of the snapshot we want to restore. Run:
 
 ```bash
-borg list /apps/storage/backups/immich/borg
+borg list /apps/storage/backups/immich
 ```
 
 You will see something like this:
