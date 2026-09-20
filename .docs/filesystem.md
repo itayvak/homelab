@@ -17,12 +17,12 @@ All of the files for the homelab services are saved at `/apps`. Inside it, these
 
 There are two physical disks, and `/apps` spans both of them:
 
-| Path                | Disk                    | Size   | Use                                     |
-| ------------------- | ----------------------- | ------ | --------------------------------------- |
-| `/apps/deploy`      | SSD (NVMe, the root fs) | 233 GB | Compose files, scripts, docs            |
-| `/apps/data`        | SSD (NVMe, the root fs) | 233 GB | Small, fast data such as databases      |
-| `/apps/secrets`     | SSD (NVMe, the root fs) | 233 GB | Secrets                                 |
-| `/apps/storage`     | HDD (`/dev/sda1`, ext4) | 2.7 TB | Media and backups                       |
+| Path            | Disk                    | Use                                |
+| --------------- | ----------------------- | ---------------------------------- |
+| `/apps/deploy`  | SSD (NVMe, the root fs) | Compose files, scripts, docs       |
+| `/apps/data`    | SSD (NVMe, the root fs) | Small, fast data such as databases |
+| `/apps/secrets` | SSD (NVMe, the root fs) | Secrets                            |
+| `/apps/storage` | HDD (ext4 mount)        | Media and backups                  |
 
 `/apps/storage` is a separate mount, so it can be missing if the HDD did not mount at boot. Docker would then write into the empty mount point on the SSD instead of the HDD. Check that the disk is mounted before starting services after a reboot:
 
@@ -32,20 +32,24 @@ findmnt /apps/storage
 
 Check free space with `df -h /apps/data /apps/storage`.
 
-## Which disk holds what
+## Adding a new service
 
-Where a service keeps its data decides how well it survives a disk failure.
+1. Create `/apps/deploy/<SERVICE_NAME>/docker-compose.yml`, and a `.env` (plus `.env.example`) if it needs secrets.
+2. Create the data directory at `/apps/data/<SERVICE_NAME>` (small data) or `/apps/storage/media/<SERVICE_NAME>` (large data), and mount it in the compose file.
+3. Add the service to the reverse proxy in `/apps/deploy/caddy/config/Caddyfile`.
+4. If it holds data I care about, create a Borg repository and add it to `run-backup.sh`, see [Backups](backups/backups.md).
+5. Add it to the [Services](services.md) table.
+6. Commit and push the change.
 
-| Service     | Data                                    | Disk | Backup repository                   | Backup disk |
-| ----------- | --------------------------------------- | ---- | ----------------------------------- | ----------- |
-| Immich      | `/apps/storage/media/immich` (media)    | HDD  | `/apps/storage/backups/immich`      | HDD         |
-| Immich      | `/apps/data/immich` (PostgreSQL)        | SSD  | Immich's database backups, inside the media directory | HDD |
-| Vaultwarden | `/apps/data/vaultwarden`                | SSD  | `/apps/storage/backups/vaultwarden` | HDD         |
-| SiYuan      | `/apps/data/siyuan`                     | SSD  | `/apps/storage/backups/siyuan`      | HDD         |
-| Planka      | `/apps/data/planka`                     | SSD  | None                                | -           |
-| Beszel      | `/apps/data/beszel`                     | SSD  | None                                | -           |
+## Deploy directory conventions
 
-The SSD data is backed up to the HDD, so losing the SSD does not lose the data. Immich's media and its backups are both on the HDD, so losing the HDD loses both. See [Backups](backups/backups.md).
+Every service in `/apps/deploy/<SERVICE_NAME>` follows these rules:
+
+- **Data is stored outside the repository**, under `/apps/data` or `/apps/storage`, and mounted into the container with an absolute path. The deploy directory only holds configuration.
+- **Secrets go in `.env`**, next to the compose file. All `.env` files are ignored by Git (see `.gitignore`), so they are never pushed. Commit a `.env.example` with the variable names and no real values, so it is clear what needs to be set up on a new machine.
+- **Containers join the external `homelab` network**, so that Caddy can reach them by container name. Create it once with `docker network create homelab`. Services that serve no traffic, such as `ddns`, don't need it.
+- **Docker works without `sudo`.** `itayvak` is in the `docker` group, so run `docker compose ...` directly (this is root-equivalent access, like `sudo`). The command is `docker compose`, there is no separate `docker-compose` program.
+- The exception to the first rule is configuration that belongs to the deployment itself, such as `caddy/config/Caddyfile`.
 
 ## Ownership and permissions
 
@@ -70,36 +74,6 @@ Everything is readable without `sudo` except the two PostgreSQL directories and 
     - **Never change the owner of the PostgreSQL directories** (`/apps/data/immich`, `/apps/data/planka/db-data`). PostgreSQL refuses to start when its data directory belongs to another user, and the service goes down.
     - **Changing the owner of `/apps/storage/media/immich` makes the next Immich backup re-read all of the photos**, because Borg treats a changed owner as a changed file. It takes a long time. The root-run Immich container also creates new files as root, so the owner does not stay consistent.
     - Only run `chown` on the paths listed above.
-
-## Deploy directory conventions
-
-Every service in `/apps/deploy/<SERVICE_NAME>` follows these rules:
-
-- **Data is stored outside the repository**, under `/apps/data` or `/apps/storage`, and mounted into the container with an absolute path. The deploy directory only holds configuration.
-- **Secrets go in `.env`**, next to the compose file. All `.env` files are ignored by Git (see `.gitignore`), so they are never pushed. Commit a `.env.example` with the variable names and no real values, so it is clear what needs to be set up on a new machine.
-- **Containers join the external `homelab` network**, so that Caddy can reach them by container name. Create it once with `docker network create homelab`. Services that serve no traffic, such as `ddns`, don't need it.
-- **Docker works without `sudo`.** `itayvak` is in the `docker` group, so run `docker compose ...` directly (this is root-equivalent access, like `sudo`). The command is `docker compose`, there is no separate `docker-compose` program.
-- The exception to the first rule is configuration that belongs to the deployment itself, such as `caddy/config/Caddyfile`.
-
-## Adding a new service
-
-1. Create `/apps/deploy/<SERVICE_NAME>/docker-compose.yml`, and a `.env` (plus `.env.example`) if it needs secrets.
-2. Create the data directory at `/apps/data/<SERVICE_NAME>` (small data) or `/apps/storage/media/<SERVICE_NAME>` (large data), and mount it in the compose file.
-3. Add the service to the reverse proxy in `/apps/deploy/caddy/config/Caddyfile`.
-4. If it holds data I care about, create a Borg repository and add it to `run-backup.sh`, see [Backups](backups/backups.md).
-5. Add it to the [Services](services.md) table.
-6. Commit and push the change.
-
-## Editing these docs
-
-The docs are written in Markdown in `/apps/deploy/.docs` and are turned into a website by MkDocs with the Material theme. The site is built into a Docker image, so the running site only changes when the image is rebuilt:
-
-```bash
-cd /apps/deploy/mkdocs
-docker compose up -d --build
-```
-
-The build uses `mkdocs build --strict`, so a broken link or a bad reference fails the build instead of shipping a broken page. The navigation is set in `/apps/deploy/mkdocs/mkdocs.yml`, so a new page needs to be added there too.
 
 ## Git
 

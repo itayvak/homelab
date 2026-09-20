@@ -70,7 +70,7 @@ cd /apps/deploy/immich
 docker compose down
 ```
 
-Then, we move the current media directory out of the way to make room for the restored data. Moving it instead of deleting it means a wrong snapshot or a failed extract is not fatal. This needs enough free disk space to hold both copies (the library is currently around 55 GB).
+Then, we move the current media directory out of the way to make room for the restored data. Moving it instead of deleting it means a wrong snapshot or a failed extract is not fatal. This needs enough free disk space to hold both copies, so check `df -h /apps/storage` first.
 
 ```bash
 mv /apps/storage/media/immich /apps/storage/media/immich.old

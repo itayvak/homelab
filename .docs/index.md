@@ -21,10 +21,22 @@ Everything runs in Docker containers, deployed with Docker Compose and exposed t
 - **Borg** backs up the important data every night at 3:00 AM.
 - **Beszel** monitors the server and its containers.
 
+
+## Editing these docs
+
+The docs are written in Markdown in `/apps/deploy/.docs` and are turned into a website by MkDocs with the Material theme. The site is built into a Docker image, so the running site only changes when the image is rebuilt:
+
+```bash
+cd /apps/deploy/mkdocs
+docker compose up -d --build
+```
+
+The build uses `mkdocs build --strict`, so a broken link or a bad reference fails the build instead of shipping a broken page. The navigation is set in `/apps/deploy/mkdocs/mkdocs.yml`, so a new page needs to be added there too.
+
 ## Ideas for the future
 
-- Immich: automatically stack duplicate photos
-- Immich: migrate photos from a Google Photos backup
+- Migrate photos from my Google Photos backup to Immich
 - Container security: resource limits and permissions
 - Offsite backups
 - Failure alerts for backups
+- HDD health monitoring
