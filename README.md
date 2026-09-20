@@ -2,7 +2,7 @@
 
 Deployment YAMLs and helpers for my personal homlab server.
 
-View the full documentation on https://docs.itayvak.com (which are also hosted on the homelab (: )
+View the full documentation on https://docs.itayvak.com (which is also hosted on the homelab [:)
 
 ## Editing rules
 
