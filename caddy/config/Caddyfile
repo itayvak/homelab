@@ -50,6 +50,6 @@ docs.itayvak.com {
     reverse_proxy mkdocs:80
 }
 
-stats.itayvak.com {
+monitoring.itayvak.com {
     reverse_proxy beszel:8090
 }
