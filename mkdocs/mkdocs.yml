@@ -4,6 +4,14 @@ repo_url: https://github.com/itayvak/homelab
 
 theme:
     name: material
+    font:
+        text: Google Sans
+        code: Google Sans Code
+
+markdown_extensions:
+    - admonition
+    - pymdownx.details
+    - pymdownx.superfences
 
 nav:
     - Home: index.md

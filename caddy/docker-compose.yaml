@@ -9,7 +9,7 @@ services:
       - 443:443/udp
     volumes:
       - ./config:/etc/caddy
-      - /apps2/data/caddy:/data
+      - /apps/data/caddy:/data
       - /etc/localtime:/etc/localtime:ro
     networks:
       - homelab
