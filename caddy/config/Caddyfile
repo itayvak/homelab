@@ -14,32 +14,11 @@ notes.itayvak.com {
 }
 
 photos.itayvak.com {
-    reverse_proxy immich_server:2283 {
-        # Increase HTTP timeout for large file uploads
-	# I later found out the limit is on cloudflare's end. So this is probably useless.
-        transport http {
-            read_timeout 600s
-            write_timeout 600s
-            dial_timeout 30s
-        }
-    }
-
-    request_body {
-        # Remove max body restriction for large files
-        max_size 0
-    }
+    reverse_proxy immich_server:2283
 }
 
 passwords.itayvak.com {
     reverse_proxy vaultwarden:80
-}
-
-ci.itayvak.com {
-    reverse_proxy drone:80
-}
-
-vpn.itayvak.com {
-    reverse_proxy headscale:8080
 }
 
 boards.itayvak.com {

@@ -36,7 +36,7 @@ Check free space with `df -h /apps/data /apps/storage`.
 
 1. Create `/apps/deploy/<SERVICE_NAME>/docker-compose.yml`, and a `.env` (plus `.env.example`) if it needs secrets.
 2. Create the data directory at `/apps/data/<SERVICE_NAME>` (small data) or `/apps/storage/media/<SERVICE_NAME>` (large data), and mount it in the compose file.
-3. Add the service to the reverse proxy in `/apps/deploy/caddy/config/Caddyfile`.
+3. Add the service to the reverse proxy in `/apps/deploy/caddy/config/Caddyfile`, see [Reverse proxy](networking/reverse-proxy.md#adding-a-new-service).
 4. If it holds data I care about, create a Borg repository and add it to `run-backup.sh`, see [Backups](backups/backups.md).
 5. Add it to the [Services](services.md) table.
 6. Commit and push the change.

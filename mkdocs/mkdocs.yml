@@ -26,7 +26,11 @@ nav:
     - Home: index.md
     - Services: services.md
     - Filesystem: filesystem.md
-    - Networking: networking.md
+    - Networking:
+        - Networking: networking/networking.md
+        - Domain: networking/domain.md
+        - Router: networking/router.md
+        - Reverse proxy: networking/reverse-proxy.md
     - Backups:
         - Backups: backups/backups.md
         - Immich: backups/backups-immich.md

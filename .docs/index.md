@@ -10,7 +10,8 @@ Everything runs in Docker containers, deployed with Docker Compose and exposed t
 | ---------------------------------------------- | --------------------------------------- |
 | See what is running and at which address       | [Services](services.md)                 |
 | Find where files and data live on the server   | [Filesystem](filesystem.md)             |
-| Understand how traffic reaches the services    | [Networking](networking.md)             |
+| Understand how traffic reaches the services    | [Networking](networking/networking.md)  |
+| Add a new service to the reverse proxy         | [Reverse proxy](networking/reverse-proxy.md) |
 | Back up, verify or restore data                | [Backups](backups/backups.md)           |
 | Restore the photo library                      | [Immich backups](backups/backups-immich.md) |
 
