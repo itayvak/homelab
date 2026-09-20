@@ -16,11 +16,6 @@ set -u
 # Make pipelines fail if any command in the pipeline fails
 set -o pipefail
 
-# ---- Generic Borg backup script ----
-#
-# Usage:
-#  create-backup-borg <repository> <srouce_driectory>
-
 # Validate arguments
 if [ "$#" -ne 2 ]; then
     echo "Usage: $0 <borg-repository> <source-directory>"

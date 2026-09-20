@@ -19,7 +19,7 @@ These are the repos I currently have:
 
 A cron job in user `itayvak`'s crontab (`crontab -e`) runs `/apps/deploy/.scripts/run-backup.sh` every day at 3:00 AM.
 
-The script runs the backups one after the other, so a slow backup never overlaps with the next one. The small backups (Vaultwarden and SiYuan) run first because they take seconds, and then Immich, which can take a long time. If one backup fails, the others still run, and the script exits with an error code.
+The script runs the backups one after the other, so a slow backup never overlaps with the next one. The small backups (Vaultwarden and SiYuan) run first because they take seconds, and then Immich, which can take a long time. If one backup fails, the others still run.
 
 ## Running Borg as itayvak
 
