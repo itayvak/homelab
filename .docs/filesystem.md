@@ -3,7 +3,7 @@
 All of the files for the homelab services are saved at `/apps`. Inside it, these subdirectories exist:
 
 - `/apps/deploy` - The deployment YAMLs for the services. All services are deployed using Docker Compose. This directory is also a [Git repository](https://github.com/itayvak/homelab) for easier editing.
-    - `/apps/deploy/.scripts` - Helper scripts, such as the [backup scripts](backups/backups.md).
+    - `/apps/deploy/.scripts` - Helper scripts, such as the [backup scripts](backups/index.md).
     - `/apps/deploy/.docs` - Documentation Markdown files for all things homelab (the ones you're viewing right now). They get built into a website using MkDocs, see [Editing these docs](#editing-these-docs).
     - `/apps/deploy/<SERVICE_NAME>` - Every service has its own directory with everything it needs to deploy. Usually contains a `docker-compose.yml` (or `.yaml`), and a `.env` file.
 - `/apps/secrets` - Secret values I want stored on the server, such as the Borg passphrase.
@@ -11,7 +11,7 @@ All of the files for the homelab services are saved at `/apps`. Inside it, these
     - `/apps/data/<SERVICE_NAME>` - Every service has its own directory with its data.
 - `/apps/storage` - Data that is mounted to the HDD. Use this for high volume data like media.
     - `/apps/storage/media/<SERVICE_NAME>` - Service data. Every service has its own directory with its data.
-    - `/apps/storage/backups/<SERVICE_NAME>` - The Borg repository of a service that is backed up. There is no extra `borg` directory, the repository is the service directory itself. I implement backups and versioning using Borg, read more about backups [here](backups/backups.md).
+    - `/apps/storage/backups/<SERVICE_NAME>` - The Borg repository of a service that is backed up. There is no extra `borg` directory, the repository is the service directory itself. I implement backups and versioning using Borg, read more about backups [here](backups/index.md).
 
 ## Disks
 
@@ -37,7 +37,7 @@ Check free space with `df -h /apps/data /apps/storage`.
 1. Create `/apps/deploy/<SERVICE_NAME>/docker-compose.yml`, and a `.env` (plus `.env.example`) if it needs secrets.
 2. Create the data directory at `/apps/data/<SERVICE_NAME>` (small data) or `/apps/storage/media/<SERVICE_NAME>` (large data), and mount it in the compose file.
 3. Add the service to the reverse proxy in `/apps/deploy/caddy/config/Caddyfile`, see [Reverse proxy](networking/reverse-proxy.md#adding-a-new-service).
-4. If it holds data I care about, create a Borg repository and add it to `run-backup.sh`, see [Backups](backups/backups.md).
+4. If it holds data I care about, create a Borg repository and add it to `run-backup.sh`, see [Backups](backups/index.md).
 5. Add it to the [Services](services.md) table.
 6. Commit and push the change.
 

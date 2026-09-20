@@ -4,6 +4,8 @@ repo_url: https://github.com/itayvak/homelab
 
 theme:
     name: material
+    features:
+    - navigation.indexes
     font:
         text: Google Sans
         code: Google Sans Code
@@ -31,10 +33,10 @@ nav:
     - Services: services.md
     - Filesystem: filesystem.md
     - Networking:
-        - Networking: networking/networking.md
+        - networking/index.md
         - Domain: networking/domain.md
         - Router: networking/router.md
         - Reverse proxy: networking/reverse-proxy.md
     - Backups:
-        - Backups: backups/backups.md
+        - backups/index.md
         - Immich: backups/backups-immich.md

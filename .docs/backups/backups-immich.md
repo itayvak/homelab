@@ -16,7 +16,7 @@ On the homelab, the directory for the database backups is `/apps/storage/media/i
 
 For the media files, we use Borg.
 
-A cron job in itayvak's crontab runs `/apps/deploy/.scripts/run-backup.sh` every day at 3:00 AM. That script runs `/apps/deploy/.scripts/create-backup-borg.sh` for each backed-up service, including Immich. The Borg script creates a new Borg archive and also handles pruning old archives and compacting the repository. See [Backups](backups.md) for the details.
+A cron job in itayvak's crontab runs `/apps/deploy/.scripts/run-backup.sh` every day at 3:00 AM. That script runs `/apps/deploy/.scripts/create-backup-borg.sh` for each backed-up service, including Immich. The Borg script creates a new Borg archive and also handles pruning old archives and compacting the repository. See [Backups](index.md) for the details.
 
 On the homelab, the Borg repository is located at `/apps/storage/backups/immich`.
 
