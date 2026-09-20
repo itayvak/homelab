@@ -1,8 +1,8 @@
-# Homelab
+# Itayvak Homelab
 
-Deployment files for my self-hosted homelab: Docker Compose setups for each service, plus the helper scripts and documentation that keep it running.
+Deployment YAMLs and helpers for my personal homlab server.
 
-📖 **Documentation:** https://docs.itayvak.com (the source is in [`.docs/`](.docs))
+View the full documentation on https://docs.itayvak.com (which are also hosted on the homelab (: )
 
 ## Editing rules
 
