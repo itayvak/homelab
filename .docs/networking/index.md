@@ -1,6 +1,6 @@
 # Networking
 
-This section describes how traffic gets from the internet to the services on the homelab.
+This section describes how traffic gets from the internet to the services on the homelab, and how I reach the server itself when away from home.
 
 ## How a request travels
 
@@ -39,3 +39,4 @@ Each step has its own page:
 | [Domain](domain.md)               | The domain, Cloudflare DNS and the DDNS container                |
 | [Router](router.md)               | The port forwarding the router needs                             |
 | [Reverse proxy](reverse-proxy.md) | Caddy: routes, HTTPS, and how to add a new service               |
+| [Remote access](remote-access.md) | SSH to the server from outside home, over Tailscale             |

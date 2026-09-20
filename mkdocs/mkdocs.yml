@@ -37,6 +37,7 @@ nav:
         - Domain: networking/domain.md
         - Router: networking/router.md
         - Reverse proxy: networking/reverse-proxy.md
+        - Remote access: networking/remote-access.md
     - Backups:
         - backups/index.md
         - Immich: backups/backups-immich.md
