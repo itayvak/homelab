@@ -55,7 +55,7 @@ Immich is reachable in two ways:
 | Address                                              | Path                                             | Use                              |
 | ---------------------------------------------------- | ------------------------------------------------ | -------------------------------- |
 | `https://photos.itayvak.com`                         | Cloudflare, then Caddy                           | From anywhere                    |
-| `http://<HOMELAB_LOCAL_ADDRESS>:2283`                | Directly to the `immich_server` container        | On the home network, large uploads |
+| `http://192.168.1.221:2283`                          | Directly to the `immich_server` container        | On the home network, large uploads |
 
 Traffic through Cloudflare has an upload size limit that I can't change, so large photo and video uploads through the domain can fail. On the home network I use the direct address instead. Immich publishes port 2283 on the homelab for this, and it bypasses both Cloudflare and Caddy. That means no HTTPS on this address, so it is only for the local network and must not be forwarded on the router, see [Router](router.md).
 
