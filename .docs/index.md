@@ -20,7 +20,7 @@ Everything runs in Docker containers, deployed with Docker Compose and exposed t
 - **Services** are deployed from `/apps/deploy/<SERVICE_NAME>`, and store their data under `/apps/data` (SSD) or `/apps/storage` (HDD).
 - **Caddy** is the Reverse Proxy that receives all web traffic and forwards it to the right container by subdomain.
 - **Tailscale** lets me SSH into the server when I'm away from home, see [Remote access](networking/remote-access.md).
-- **Borg** backs up the important data every night at 3:00 AM.
+- **Borg** backs up the important data every night at 3:00 AM, both locally and offsite to a second machine over Tailscale.
 - **Beszel** monitors the server and its containers.
 
 
@@ -39,6 +39,5 @@ The build uses `mkdocs build --strict`, so a broken link or a bad reference fail
 
 - Migrate photos from my Google Photos backup to Immich
 - Container security: resource limits and permissions
-- Offsite backups
 - Failure alerts for backups
 - HDD health monitoring

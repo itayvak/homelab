@@ -36,8 +36,8 @@ if [ ! -d "$BACKUP_DIR" ]; then
     exit 1
 fi
 
-# Validate Borg repository
-if [ ! -d "$BORG_REPO" ]; then
+# Validate Borg repository (skip the local directory check for remote ssh:// repos)
+if [[ "$BORG_REPO" != ssh://* ]] && [ ! -d "$BORG_REPO" ]; then
     echo "ERROR: Borg repository does not exist:"
     echo "  $BORG_REPO"
     exit 1

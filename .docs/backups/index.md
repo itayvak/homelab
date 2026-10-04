@@ -6,20 +6,22 @@ I use Borg as the backup system.
 
 These are the repos I currently have:
 
-| Service Name | Repository Directory                | Source Directory             | Notes                                                                    |
-| ------------ | ----------------------------------- | ---------------------------- | ------------------------------------------------------------------------ |
-| Immich       | `/apps/storage/backups/immich`      | `/apps/storage/media/immich` | This backup is a bit complicated.<br />See more [here](backups-immich.md) |
-| Vaultwarden  | `/apps/storage/backups/vaultwarden` | `/apps/data/vaultwarden`     | See [known limitations](#known-limitations)                              |
-| SiYuan       | `/apps/storage/backups/siyuan`      | `/apps/data/siyuan`          |                                                                          |
+| Service Name | Repository Directory                | Offsite Repository                                   | Source Directory             | Notes                                                                    |
+| ------------ | ----------------------------------- | ----------------------------------------------------- | ----------------------------- | ------------------------------------------------------------------------ |
+| Immich       | `/apps/storage/backups/immich`      | `ssh://itayvak@itayvak-backlab/storage/backups/immich`      | `/apps/storage/media/immich` | This backup is a bit complicated.<br />See more [here](backups-immich.md) |
+| Vaultwarden  | `/apps/storage/backups/vaultwarden` | `ssh://itayvak@itayvak-backlab/storage/backups/vaultwarden` | `/apps/data/vaultwarden`     | See [known limitations](#known-limitations)                              |
+| SiYuan       | `/apps/storage/backups/siyuan`      | `ssh://itayvak@itayvak-backlab/storage/backups/siyuan`      | `/apps/data/siyuan`          |                                                                          |
 
-!!! warning "Backups are stored on the same machine as the data"
-    All backups are stored on the HDD (`/apps/storage/backups`), on the same machine as the data. Services whose data is on the SSD (Vaultwarden, SiYuan) survive an SSD failure, but Immich's media is on the HDD too, so losing the HDD loses both the photos and their backup. Nothing survives a fire, a theft or losing the whole machine. I plan to add an offsite backup server.
+!!! warning "Local backups share the homelab's HDD with the data"
+    Local backups are stored on the HDD (`/apps/storage/backups`), on the same machine as the data. Services whose data is on the SSD (Vaultwarden, SiYuan) survive an SSD failure from the local copy alone, but Immich's media is on the HDD too, so losing the HDD loses both the photos and their local backup. Every repo also has an [offsite copy](#offsite-backups) on a second machine, `itayvak-backlab`, reached over Tailscale, which survives losing the homelab machine entirely (fire, theft, hardware failure).
 
 ## Schedule
 
 A cron job in user `itayvak`'s crontab (`crontab -e`) runs `/apps/deploy/.scripts/run-backup.sh` every day at 3:00 AM.
 
 The script runs the backups one after the other, so a slow backup never overlaps with the next one. The small backups (Vaultwarden and SiYuan) run first because they take seconds, and then Immich, which can take a long time. If one backup fails, the others still run.
+
+For each service, the local backup runs first and the offsite backup to `itayvak-backlab` runs immediately after, before moving on to the next service. See [Offsite backups](#offsite-backups).
 
 ## Running Borg as itayvak
 
@@ -83,6 +85,46 @@ The retention policy for archives is:
 Prune keeps one archive per day, so a manual archive made on the same day as the 3 AM one replaces it once the prune runs.
 
 The first run of Borg after the cache has been lost (or after switching users) is slow, because Borg has to read and hash every file. Later runs skip unchanged files and are much faster.
+
+## Offsite backups
+
+Every local repo also has an offsite copy on a second machine, `itayvak-backlab`, which is reached over [Tailscale](../networking/remote-access.md). This is a fully independent Borg backup, not a mirror of the local repo: `create-backup-borg.sh` runs a second time against a remote `ssh://` repository, reading the source directory again and writing its own, separate chain of archives. A problem with the local repo (corruption, a bad prune) has no effect on the offsite copy.
+
+Offsite repos live at `/storage/backups/<SERVICE_NAME>` under the `itayvak` user on `itayvak-backlab`, use the same encryption and passphrase as the local repos (`/apps/secrets/borg-passphrase`), and use the same retention policy (7 daily / 3 weekly / 3 monthly).
+
+`itayvak-homelab` reaches `itayvak-backlab` using a dedicated SSH keypair, `~/.ssh/id_ed25519_borg_backlab`, set up only for this and not used for interactive login. It's configured in `~/.ssh/config`:
+
+```
+Host itayvak-backlab
+    HostName itayvak-backlab
+    User itayvak
+    IdentityFile ~/.ssh/id_ed25519_borg_backlab
+    IdentitiesOnly yes
+```
+
+The matching public key is appended to `itayvak`'s `~/.ssh/authorized_keys` on `itayvak-backlab`.
+
+### Creating a new offsite repository
+
+When adding backups for a new service, create the offsite repo the same way as the [local one](#creating-a-repository), just over SSH:
+
+```bash
+ssh itayvak-backlab 'mkdir -p /storage/backups/<SERVICE_NAME>'
+ssh itayvak-backlab 'borg init --encryption=repokey-blake2 /storage/backups/<SERVICE_NAME>'
+```
+
+Use the same passphrase from `/apps/secrets/borg-passphrase` when prompted, export the key (`borg key export`, run on `itayvak-backlab`), and save it to Bitwarden just like the local repo's key.
+
+### Restoring from the offsite copy
+
+Only needed if the homelab's local repo is also unavailable. List and extract archives the same way as a [local restore](#restoring-a-backup), just pointing at the remote repo, for example:
+
+```bash
+borg list ssh://itayvak@itayvak-backlab/storage/backups/<SERVICE_NAME>
+borg extract ssh://itayvak@itayvak-backlab/storage/backups/<SERVICE_NAME>::<ARCHIVE_NAME>
+```
+
+This can be run from `itayvak-homelab` (or its replacement) using the same `BORG_PASSCOMMAND` as local repos, as long as it can reach `itayvak-backlab` over Tailscale and has SSH access set up as above.
 
 ## Verifying backups
 
@@ -214,4 +256,4 @@ If the whole machine is lost and the repositories are still available (for examp
 
 - **Vaultwarden is backed up while it is running.** Vaultwarden uses SQLite in WAL mode (`db.sqlite3`, `db.sqlite3-wal`, `db.sqlite3-shm`), and copying those files while the service writes to them can produce an inconsistent database. The safe way is to take a snapshot with `sqlite3 db.sqlite3 ".backup <FILE>"` before backing up, or to stop the container briefly. This is not done yet, and `sqlite3` is not installed on the homelab.
 - **Failures are silent.** If a backup fails, nothing notifies me. Check `borg list --last 3 <REPO_DIR>` from time to time.
-- **Offsite backup does not exist yet**, see the warning at the top.
+- **The offsite SSH key has full `itayvak` access on `itayvak-backlab`**, not just access to run Borg. It's a dedicated key used only for this job, but it isn't restricted (e.g. with `borg serve --restrict-to-path` and a forced command in `authorized_keys`), so a compromised homelab could do more than just back up through it.

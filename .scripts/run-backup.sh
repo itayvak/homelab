@@ -10,11 +10,21 @@
 # time to finish.
 #
 # The small backups run first, so they don't wait behind the long Immich one.
+#
+# Each service is backed up twice: once to the local repo, then once to an
+# offsite repo on itayvak-backlab (reached over Tailscale), so backups
+# survive losing the homelab machine entirely. See .docs/backups/index.md.
 # ===========================================================================
 
+BACKLAB_REPO_ROOT="ssh://itayvak@itayvak-backlab/storage/backups"
+HOMELAB_REPO_ROOT="/apps/storage/backups"
+
 # backup Vaultwarden
-/apps/deploy/.scripts/create-backup-borg.sh /apps/storage/backups/vaultwarden /apps/data/vaultwarden/
+/apps/deploy/.scripts/create-backup-borg.sh "$HOMELAB_REPO_ROOT/vaultwarden" /apps/data/vaultwarden/
+/apps/deploy/.scripts/create-backup-borg.sh "$BACKLAB_REPO_ROOT/vaultwarden" /apps/data/vaultwarden/
 # backup SiYuan
-/apps/deploy/.scripts/create-backup-borg.sh /apps/storage/backups/siyuan /apps/data/siyuan/
+/apps/deploy/.scripts/create-backup-borg.sh "$HOMELAB_REPO_ROOT/siyuan" /apps/data/siyuan/
+/apps/deploy/.scripts/create-backup-borg.sh "$BACKLAB_REPO_ROOT/siyuan" /apps/data/siyuan/
 # backup Immich
-/apps/deploy/.scripts/create-backup-borg.sh /apps/storage/backups/immich/ /apps/storage/media/immich/
+/apps/deploy/.scripts/create-backup-borg.sh "$HOMELAB_REPO_ROOT/immich" /apps/storage/media/immich/
+/apps/deploy/.scripts/create-backup-borg.sh "$BACKLAB_REPO_ROOT/immich" /apps/storage/media/immich/
