@@ -1,0 +1,66 @@
+services:
+  chromium:
+    image: lscr.io/linuxserver/chromium:latest
+    container_name: chromium
+    restart: unless-stopped
+    # Chromium crashes with Docker's default 64 MB of shared memory
+    shm_size: "1gb"
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Asia/Jerusalem
+      # The container's own login. I never type it: TinyAuth hands it to Caddy, which adds it to every request.
+      - CUSTOM_USER=${CUSTOM_USER}
+      - PASSWORD=${PASSWORD}
+      - CHROME_CLI=https://web.whatsapp.com
+      # The sidebar's file panel serves ~/Desktop by default, but Chromium saves downloads to ~/Downloads.
+      # Point the panel at Downloads, so downloads can be fetched to the PC and uploads land there too.
+      - FILE_MANAGER_PATH=/config/Downloads
+    volumes:
+      - /apps/data/chromium:/config
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 2g
+    networks:
+      - homelab
+
+  # Login page in front of browser.itayvak.com. The work PC's Chrome won't show basic auth prompts,
+  # so the login has to be a normal web page with a session cookie.
+  tinyauth:
+    image: ghcr.io/tinyauthapp/tinyauth:latest
+    container_name: chromium_tinyauth
+    restart: unless-stopped
+    environment:
+      - TINYAUTH_APPURL=https://auth.itayvak.com
+      - TINYAUTH_AUTH_USERS=${TINYAUTH_USERS}
+      - TINYAUTH_AUTH_SECURECOOKIE=true
+      # Only Caddy (on the homelab network) may tell TinyAuth the real client IP
+      - TINYAUTH_AUTH_TRUSTEDPROXIES=172.18.0.0/16
+      # 3 wrong passwords lock the username for 5 minutes
+      - TINYAUTH_AUTH_LOGINMAXRETRIES=3
+      - TINYAUTH_AUTH_LOGINTIMEOUT=300
+      # Log in again every 12 hours
+      - TINYAUTH_AUTH_SESSIONEXPIRY=43200
+      # Refuse any domain that isn't listed under apps below
+      - TINYAUTH_AUTH_ACLS_POLICY=deny
+      - TINYAUTH_APPS_BROWSER_CONFIG_DOMAIN=browser.itayvak.com
+      - TINYAUTH_APPS_BROWSER_USERS_ALLOW=itayvak
+      # After login, pass the container's own credentials on to it
+      - TINYAUTH_APPS_BROWSER_RESPONSE_BASICAUTH_USERNAME=${CUSTOM_USER}
+      - TINYAUTH_APPS_BROWSER_RESPONSE_BASICAUTH_PASSWORD=${PASSWORD}
+      - TINYAUTH_ANALYTICS_ENABLED=false
+    volumes:
+      - /apps/data/tinyauth:/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.5"
+          memory: 256m
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

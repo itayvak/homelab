@@ -39,6 +39,9 @@ These are the routes in the Caddyfile:
 | `docs.itayvak.com`       | `mkdocs:80`         |                                      |
 | `monitoring.itayvak.com` | `beszel:8090`       |                                      |
 | `secret.itayvak.com`     | `youaregay:80`      | A joke website                       |
+| `albums.itayvak.com`     | `album-player:80`   | Static Spotify album picker page     |
+| `browser.itayvak.com`    | `chromium:3000`     | See [Remote browser](#remote-browser) |
+| `auth.itayvak.com`       | `chromium_tinyauth:3000` | Login page for the remote browser |
 
 The Caddyfile also has a commented-out `testing.itayvak.com` block. Uncomment it and point it at a container to try a new app on a temporary address.
 
@@ -60,6 +63,35 @@ Immich is reachable in two ways:
 Traffic through Cloudflare has an upload size limit that I can't change, so large photo and video uploads through the domain can fail. On the home network I use the direct address instead. Immich publishes port 2283 on the homelab for this, and it bypasses both Cloudflare and Caddy. That means no HTTPS on this address, so it is only for the local network and must not be forwarded on the router, see [Router](router.md).
 
 The Caddyfile route for Immich is a plain reverse proxy, with no special upload settings. Settings such as a larger request size or longer timeouts would not help, because the limit is on Cloudflare's side, and traffic through the domain always passes through Cloudflare first.
+
+## Remote browser
+
+`browser.itayvak.com` streams a Chromium browser running on the homelab (`/apps/deploy/chromium`, the `lscr.io/linuxserver/chromium` image). I use it for WhatsApp Web from my work PC, whose network blocks WhatsApp and where I can't install software. It holds a logged-in WhatsApp session, so its route is locked down more than the others. This is a temporary setup, [`chromium/REMOVE.md`](https://github.com/itayvak/homelab/blob/main/chromium/REMOVE.md) lists how to remove all of it.
+
+- **Login page (TinyAuth).** The work PC's Chrome doesn't show basic auth prompts, so the login is a web page instead: [TinyAuth](https://github.com/tinyauthapp/tinyauth) at `auth.itayvak.com`, running as the `chromium_tinyauth` container in the same compose file. Caddy asks it about every request to `browser.itayvak.com` (`forward_auth`), and sends visitors who aren't logged in to the login page. The login is in `/apps/deploy/chromium/.env`. A session lasts 12 hours. 3 wrong passwords lock the username for 5 minutes.
+- **The container's own login stays on.** I never type it: after login, TinyAuth gives Caddy the container's username and password (`CUSTOM_USER`/`PASSWORD` in `.env`), and Caddy adds them to the request. Other containers on the `homelab` network still can't open the browser without them.
+- **Only `browser.itayvak.com` is allowed.** TinyAuth denies every domain except the ones listed in its `TINYAUTH_APPS_*` settings.
+- **Cloudflare only.** Requests that don't come from [Cloudflare's IP ranges](https://www.cloudflare.com/ips/) are dropped, on both subdomains, so nobody can reach them by connecting to the home IP directly. The ranges are in the `(cloudflare_only)` snippet in the Caddyfile. If Cloudflare changes them, the sites stop loading, and the list needs updating.
+- **Everything is inside `route { }`,** so the Cloudflare check runs before anything else. Caddy's default order would run some handlers before `abort`.
+- **Security headers:** HSTS, `X-Frame-Options DENY`, `nosniff`, `no-referrer`.
+
+TinyAuth's session cookie is set on `.itayvak.com`, so the browser also sends it to the other subdomains. It only grants access to `browser.itayvak.com`.
+
+The remote desktop stream is a WebSocket at `/api/websockets`. Caddy and Cloudflare both pass WebSockets through without extra settings.
+
+To change the TinyAuth password, create a new hash and put it in `TINYAUTH_USERS` in `.env` (in single quotes), then recreate the container:
+
+```bash
+docker run --rm ghcr.io/tinyauthapp/tinyauth:latest user create --username itayvak --password '<NEW_PASSWORD>'
+cd /apps/deploy/chromium && docker compose up -d
+```
+
+**Moving files between the PC and the remote browser** goes through the file section of the sidebar, on the left edge of the page. It works on `/apps/data/chromium/Downloads` (`FILE_MANAGER_PATH` in the compose file), which is also where Chromium saves downloads:
+
+- **Server to PC:** download the file in the remote browser, then click it in the sidebar's file list, and it downloads to the PC.
+- **PC to server:** upload it in the sidebar. It lands in `Downloads`, where the remote browser's file picker (for example, WhatsApp's attach button) can pick it.
+
+Files stay in `Downloads` until deleted, either from the sidebar or with `rm` on the server. The browser profile (including the WhatsApp login) is in `/apps/data/chromium` and is not backed up. If it is lost, I scan the QR code again.
 
 ## Adding a new service
 

@@ -1,6 +1,7 @@
 services:
   siyuan:
-    image: b3log/siyuan:v3.8.4
+    # TODO: when upgrading to v3.8.7 or later, delete the @pwa_launch block for notes.itayvak.com in caddy/config/Caddyfile
+    image: b3log/siyuan:v3.8.6
     container_name: siyuan
     command: ['serve', '--workspace=/siyuan/workspace/', '--accessAuthCode=${ACCESS_CODE}']
     volumes:

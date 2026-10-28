@@ -60,6 +60,8 @@ Every service in `/apps/deploy/<SERVICE_NAME>` follows these rules:
 | `/apps`, `/apps/deploy`, `/apps/secrets` | `itayvak`          | I edit these by hand, without `sudo`. `/apps/secrets/borg-passphrase` is mode `600`. |
 | `/apps/storage/backups`               | `itayvak`             | Borg runs as `itayvak`, so it must be able to write here.                    |
 | `/apps/data/siyuan`                   | `itayvak`             | The SiYuan container runs as UID 1000, which is `itayvak`.                   |
+| `/apps/data/chromium`                 | `itayvak`             | The Chromium container runs as UID 1000 (`PUID`/`PGID` in its compose file). |
+| `/apps/data/tinyauth`                 | `root`                | Session database of the TinyAuth container (`chromium/`), which runs as root. |
 | `/apps/data/planka/app-data`          | `itayvak`             | The Planka container runs as UID 1000, so it needs to write uploads here.    |
 | `/apps/deploy/immich-stack/logs`      | `itayvak`             | The Immich Stack container runs as UID 1000.                                 |
 | `/apps/data/immich`                   | UID `999`, mode `700` | The Immich PostgreSQL container owns it. Don't change this.                  |

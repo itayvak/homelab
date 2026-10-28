@@ -1,0 +1,11 @@
+services:
+  album-player:
+    build: .
+    container_name: album-player
+    restart: unless-stopped
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

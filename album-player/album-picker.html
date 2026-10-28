@@ -1,0 +1,744 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1b1720">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Album Picker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,500,0..1,0&display=block" rel="stylesheet">
+<style>
+:root{
+  --h:265;
+  --bg:hsl(var(--h) 40% 98%);
+  --surface:hsl(var(--h) 30% 95%);
+  --surface2:hsl(var(--h) 28% 91%);
+  --surface3:hsl(var(--h) 24% 86%);
+  --primary:hsl(var(--h) 50% 38%);
+  --on-primary:#fff;
+  --pc:hsl(var(--h) 70% 90%);
+  --on-pc:hsl(var(--h) 60% 15%);
+  --text:hsl(var(--h) 15% 10%);
+  --text2:hsl(var(--h) 8% 38%);
+  --outline:hsl(var(--h) 10% 75%);
+  --l1:hsl(145 55% 24%);--l1-bg:hsl(145 60% 86%);
+  --l2:hsl(38 80% 26%);--l2-bg:hsl(42 90% 84%);
+  --l3:hsl(290 50% 30%);--l3-bg:hsl(290 70% 90%);
+  --nope-bg:hsl(var(--h) 20% 88%);
+  --scrim:rgba(0,0,0,.4);
+  --r-xl:28px;--r-l:20px;--r-m:16px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:hsl(var(--h) 14% 7%);
+    --surface:hsl(var(--h) 14% 11%);
+    --surface2:hsl(var(--h) 15% 15%);
+    --surface3:hsl(var(--h) 15% 20%);
+    --primary:hsl(var(--h) 75% 80%);
+    --on-primary:hsl(var(--h) 60% 18%);
+    --pc:hsl(var(--h) 40% 27%);
+    --on-pc:hsl(var(--h) 80% 91%);
+    --text:hsl(var(--h) 15% 92%);
+    --text2:hsl(var(--h) 10% 70%);
+    --outline:hsl(var(--h) 8% 32%);
+    --l1:hsl(145 60% 84%);--l1-bg:hsl(145 40% 20%);
+    --l2:hsl(42 90% 82%);--l2-bg:hsl(38 45% 22%);
+    --l3:hsl(290 70% 88%);--l3-bg:hsl(290 30% 25%);
+    --nope-bg:hsl(var(--h) 12% 20%);
+    --scrim:rgba(0,0,0,.6);
+  }
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font-family:"Google Sans","Product Sans",system-ui,sans-serif;transition:background .6s}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+input{font:inherit;color:inherit}
+.ms{font-family:"Material Symbols Rounded";font-weight:normal;font-style:normal;font-size:24px;line-height:1;display:inline-block;font-feature-settings:"liga";-webkit-font-smoothing:antialiased;user-select:none}
+.fill{font-variation-settings:"FILL" 1}
+.view{display:none;min-height:100%;padding:calc(env(safe-area-inset-top) + 8px) 16px calc(env(safe-area-inset-bottom) + 96px)}
+.view.on{display:block}
+.max{max-width:720px;margin:0 auto}
+
+/* top bar */
+.bar{display:flex;align-items:center;gap:8px;height:64px}
+.bar h1{flex:1;margin:0;font-size:28px;font-weight:500}
+.icon-btn{width:48px;height:48px;border-radius:50%;display:grid;place-items:center}
+.icon-btn:active{background:var(--surface3)}
+
+/* buttons */
+.btn{height:48px;padding:0 24px;border-radius:24px;font-weight:500;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn.filled{background:var(--primary);color:var(--on-primary)}
+.btn.tonal{background:var(--pc);color:var(--on-pc)}
+.btn.text{color:var(--primary);padding:0 12px}
+.btn:disabled{opacity:.4}
+.fab{position:fixed;right:max(16px,calc(50% - 344px));bottom:calc(env(safe-area-inset-bottom) + 20px);height:64px;padding:0 24px 0 20px;border-radius:var(--r-l);background:var(--pc);color:var(--on-pc);display:flex;align-items:center;gap:12px;font-weight:500;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,.25);z-index:5}
+
+/* fields */
+.field{display:block;margin:12px 0}
+.field span{display:block;font-size:13px;color:var(--text2);margin:0 0 6px 4px}
+.field input{width:100%;height:56px;padding:0 16px;border-radius:var(--r-m) var(--r-m) 4px 4px;border:0;border-bottom:2px solid var(--outline);background:var(--surface2);outline:none}
+.field input:focus{border-bottom-color:var(--primary)}
+.copy-row{display:flex;gap:8px;align-items:center;background:var(--surface2);border-radius:var(--r-m);padding:8px 8px 8px 16px;font-size:13px;word-break:break-all}
+.copy-row code{flex:1}
+
+/* cards */
+.card{background:var(--surface);border-radius:var(--r-xl);padding:20px}
+.setup ol{padding-left:20px;line-height:1.6;color:var(--text2)}
+.setup ol b{color:var(--text)}
+.setup a{color:var(--primary)}
+
+.now-bar{display:flex;align-items:center;gap:12px;background:var(--pc);color:var(--on-pc);border-radius:var(--r-l);padding:10px 12px 10px 10px;margin:4px 0 16px;width:100%;text-align:left}
+.now-bar img{width:48px;height:48px;border-radius:12px;object-fit:cover}
+.now-bar .t{flex:1;min-width:0}
+.now-bar .t b,.now-bar .t small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.albums{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.album{background:var(--surface);border-radius:var(--r-l);padding:10px 10px 14px;text-align:left;position:relative;cursor:pointer}
+.album .more{position:absolute;top:16px;right:16px;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.album .more:active{background:rgba(0,0,0,.65)}
+.tabs{margin:0 0 16px}
+.faded{opacity:.45}
+.menu-scrim{position:fixed;inset:0;z-index:30;display:none}
+.menu-scrim.on{display:block}
+.menu{position:fixed;z-index:31;min-width:220px;background:var(--surface2);border-radius:var(--r-m);padding:8px 0;box-shadow:0 8px 24px rgba(0,0,0,.3);display:none;transform-origin:top right}
+.menu.on{display:block;animation:menuIn .18s cubic-bezier(.2,0,0,1)}
+@keyframes menuIn{from{opacity:0;transform:scale(.9)}}
+.menu button{display:flex;align-items:center;gap:14px;width:100%;height:52px;padding:0 20px;text-align:left;font-size:16px}
+.menu button:active{background:var(--surface3)}
+.menu button.danger{color:hsl(0 65% 50%)}
+@media (prefers-color-scheme: dark){.menu button.danger{color:hsl(0 80% 75%)}}
+.album:active{background:var(--surface2)}
+.album img{width:100%;aspect-ratio:1;border-radius:14px;object-fit:cover;display:block;background:var(--surface3)}
+.album b{display:block;margin:10px 4px 2px;font-weight:500;font-size:15px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.album small{display:block;margin:0 4px;color:var(--text2);font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chips{display:flex;gap:6px;margin:8px 4px 0;flex-wrap:wrap}
+.chip{font-size:12px;padding:3px 10px;border-radius:8px;background:var(--surface2);color:var(--text2);display:inline-flex;align-items:center;gap:4px}
+.chip .ms{font-size:14px}
+.chip.done{background:var(--pc);color:var(--on-pc)}
+.empty{text-align:center;color:var(--text2);padding:64px 24px}
+.empty .ms{font-size:64px;color:var(--primary);opacity:.7}
+
+/* sheet */
+.scrim{position:fixed;inset:0;background:var(--scrim);z-index:20;opacity:0;pointer-events:none;transition:opacity .25s}
+.scrim.on{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:0;right:0;bottom:0;max-width:720px;margin:0 auto;max-height:88vh;background:var(--surface);border-radius:var(--r-xl) var(--r-xl) 0 0;z-index:21;transform:translateY(105%);transition:transform .3s cubic-bezier(.2,0,0,1);display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+.sheet.on{transform:none}
+.sheet .grab{width:32px;height:4px;border-radius:2px;background:var(--outline);margin:12px auto 4px}
+.sheet .sh-head{padding:8px 20px 4px;display:flex;align-items:center}
+.sheet .sh-head h2{flex:1;margin:0;font-size:22px;font-weight:500}
+.sheet .sh-body{overflow:auto;padding:4px 20px 20px}
+.list-item{display:flex;align-items:center;gap:14px;padding:10px 4px;border-radius:var(--r-m);width:100%;text-align:left;min-height:64px}
+.list-item:active{background:var(--surface2)}
+.list-item img{width:56px;height:56px;border-radius:12px;object-fit:cover;background:var(--surface3)}
+.list-item .ic{width:56px;height:56px;border-radius:12px;display:grid;place-items:center;background:var(--surface2)}
+.list-item .t{flex:1;min-width:0}
+.list-item .t b{display:block;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item .t small{display:block;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list-item.sel{background:var(--pc);color:var(--on-pc)}
+.list-item.sel small{color:inherit;opacity:.8}
+.sec-title{font-size:14px;font-weight:500;color:var(--primary);margin:20px 4px 6px}
+.row-btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+
+/* player */
+#player{padding-bottom:calc(env(safe-area-inset-bottom) + 24px)}
+.p-wrap{display:flex;flex-direction:column;align-items:center;gap:20px;max-width:520px;margin:0 auto}
+.p-cover{width:min(78vw,380px);aspect-ratio:1;border-radius:var(--r-xl);object-fit:cover;box-shadow:0 12px 40px rgba(0,0,0,.35);background:var(--surface3)}
+.p-info{width:100%;text-align:center}
+.p-info h2{margin:0;font-size:clamp(24px,6vw,32px);font-weight:700;line-height:1.15}
+.p-info p{margin:6px 0 0;color:var(--text2);font-size:17px}
+.p-album{font-size:13px;color:var(--text2);text-align:center;letter-spacing:.3px}
+.prog{width:100%;height:6px;border-radius:3px;background:var(--surface3);overflow:hidden}
+.prog i{display:block;height:100%;width:0;background:var(--primary);border-radius:3px;transition:width 1s linear}
+.p-ctrl{display:flex;align-items:center;justify-content:center;gap:16px;width:100%}
+.p-ctrl .icon-btn{width:72px;height:72px;background:var(--surface2)}
+.p-ctrl .icon-btn .ms{font-size:36px}
+.p-ctrl .play{width:96px;height:96px;border-radius:32px;background:var(--primary);color:var(--on-primary)}
+.p-ctrl .play .ms{font-size:48px}
+.rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;width:100%}
+.rate-row button{height:72px;border-radius:24px;background:var(--surface2);color:var(--text2);font-size:30px;font-weight:700;display:grid;place-items:center;transition:background .2s,border-radius .2s}
+.rate-row button .ms{font-size:30px}
+.rate-row button.on{border-radius:36px}
+.lv1.on,#rate .lv1{background:var(--l1-bg);color:var(--l1)}
+.lv2.on,#rate .lv2{background:var(--l2-bg);color:var(--l2)}
+.lv3.on,#rate .lv3{background:var(--l3-bg);color:var(--l3)}
+.nope.on{background:var(--surface3);color:var(--text)}
+.lv-dot{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;font-weight:700;font-size:18px}
+.status{font-size:13px;color:var(--text2);min-height:18px;text-align:center}
+
+/* rating overlay */
+#rate{position:fixed;inset:0;z-index:40;background:var(--bg);display:none;flex-direction:column;padding:calc(env(safe-area-inset-top) + 12px) 12px calc(env(safe-area-inset-bottom) + 12px);gap:12px}
+#rate.on{display:flex;animation:pop .25s cubic-bezier(.2,0,0,1)}
+@keyframes pop{from{opacity:0;transform:scale(.97)}}
+.r-head{display:flex;align-items:center;gap:14px;padding:4px 8px}
+.r-head img{width:64px;height:64px;border-radius:16px;object-fit:cover}
+.r-head .t{flex:1;min-width:0}
+.r-head small{color:var(--text2);font-size:14px}
+.r-head b{display:block;font-size:22px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.r-btns{flex:1;display:flex;flex-direction:column;gap:10px}
+.r-btns button{flex:1;border-radius:32px;display:flex;align-items:center;gap:20px;padding:0 28px;text-align:left;min-height:0}
+.r-btns .num{font-size:clamp(56px,13vh,96px);font-weight:700;line-height:1;width:1.1em;text-align:center}
+.r-btns .lbl{font-size:22px;font-weight:700;line-height:1.2;overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.r-btns .nope{flex:.75;background:var(--nope-bg);color:var(--text2);justify-content:center}
+.r-btns .nope .ms{font-size:48px}
+.r-btns button:active{transform:scale(.98)}
+.r-timer{height:6px;border-radius:3px;background:var(--surface3);overflow:hidden}
+.r-timer i{display:block;height:100%;background:var(--primary);width:100%}
+@media (orientation:landscape) and (max-height:600px){
+  .r-btns{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr}
+  .r-btns .lbl{font-size:18px}
+  .p-wrap{flex-direction:row;flex-wrap:wrap;justify-content:center;max-width:none}
+  .p-cover{width:min(40vh,260px)}
+}
+
+/* snackbar */
+#snack{position:fixed;left:16px;right:16px;bottom:calc(env(safe-area-inset-bottom) + 96px);max-width:560px;margin:0 auto;background:var(--text);color:var(--bg);padding:14px 18px;border-radius:12px;z-index:60;transform:translateY(20px);opacity:0;transition:.25s;pointer-events:none;font-size:15px}
+#snack.on{opacity:1;transform:none}
+.spin{width:28px;height:28px;border:3px solid var(--surface3);border-top-color:var(--primary);border-radius:50%;animation:sp 1s linear infinite;margin:24px auto}
+@keyframes sp{to{transform:rotate(360deg)}}
+.seg{display:flex;background:var(--surface2);border-radius:20px;padding:4px;gap:4px}
+.seg button{flex:1;height:40px;border-radius:16px;font-weight:500;font-size:14px}
+.seg button.on{background:var(--pc);color:var(--on-pc)}
+</style>
+</head>
+<body>
+
+<!-- SETUP -->
+<section id="setup" class="view">
+  <div class="max setup">
+    <div class="bar"><h1>Album Picker</h1></div>
+    <div class="card">
+      <p style="margin-top:0">Listen to full albums, keep the songs you love. One-time setup:</p>
+      <ol>
+        <li>Open <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener">developer.spotify.com/dashboard</a> and <b>Create app</b>.</li>
+        <li>Under <b>Redirect URIs</b>, paste this address:</li>
+      </ol>
+      <div class="copy-row"><code id="redirShow"></code><button class="icon-btn" data-copy="redir"><span class="ms">content_copy</span></button></div>
+      <ol start="3">
+        <li>Tick <b>Web API</b>, save, then copy the <b>Client ID</b> here:</li>
+      </ol>
+      <label class="field"><span>Client ID</span><input id="cidInput" autocomplete="off" spellcheck="false" placeholder="e.g. 3f8a…"></label>
+      <div class="row-btns"><button class="btn filled" id="connectBtn"><span class="ms">link</span>Connect Spotify</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- HOME -->
+<section id="home" class="view">
+  <div class="max">
+    <div class="bar">
+      <h1>Albums</h1>
+      <button class="icon-btn" id="settingsBtn" aria-label="Settings"><span class="ms">settings</span></button>
+    </div>
+    <button class="now-bar" id="nowBar" hidden>
+      <img id="nbImg" alt="">
+      <div class="t"><small>Now listening</small><b id="nbTitle"></b></div>
+      <span class="ms">arrow_forward</span>
+    </button>
+    <div class="seg tabs" id="homeTabs">
+      <button data-tab="todo" class="on">To listen</button>
+      <button data-tab="done">Listened</button>
+    </div>
+    <div id="albumGrid" class="albums"></div>
+  </div>
+  <button class="fab" id="addBtn"><span class="ms">add</span>Add album</button>
+</section>
+
+<!-- PLAYER -->
+<section id="player" class="view">
+  <div class="bar max">
+    <button class="icon-btn" id="backBtn" aria-label="Back"><span class="ms">expand_more</span></button>
+    <div style="flex:1" class="p-album" id="pAlbum"></div>
+    <button class="icon-btn" id="stopBtn" aria-label="Stop album"><span class="ms">close</span></button>
+  </div>
+  <div class="p-wrap">
+    <img class="p-cover" id="pCover" alt="">
+    <div style="width:100%;display:flex;flex-direction:column;gap:18px">
+      <div class="p-info"><h2 id="pTitle">—</h2><p id="pArtist"></p></div>
+      <div class="prog"><i id="pProg"></i></div>
+      <div class="p-ctrl">
+        <button class="icon-btn" id="prevBtn" aria-label="Previous"><span class="ms fill">skip_previous</span></button>
+        <button class="icon-btn play" id="playBtn" aria-label="Play/pause"><span class="ms fill" id="playIc">pause</span></button>
+        <button class="icon-btn" id="nextBtn" aria-label="Next"><span class="ms fill">skip_next</span></button>
+      </div>
+      <div class="rate-row" id="rateRow">
+        <button data-r="nope" class="nope" aria-label="Nah"><span class="ms">thumb_down</span></button>
+        <button data-r="1" class="lv1">1</button>
+        <button data-r="2" class="lv2">2</button>
+        <button data-r="3" class="lv3">3</button>
+      </div>
+      <div class="status" id="pStatus"></div>
+    </div>
+  </div>
+</section>
+
+<!-- RATE OVERLAY -->
+<div id="rate">
+  <div class="r-head">
+    <img id="rImg" alt="">
+    <div class="t"><small>Keep this one?</small><b id="rTitle"></b></div>
+  </div>
+  <div class="r-btns" id="rBtns">
+    <button data-r="1" class="lv1"><span class="num">1</span><span class="lbl" data-lbl="1"></span></button>
+    <button data-r="2" class="lv2"><span class="num">2</span><span class="lbl" data-lbl="2"></span></button>
+    <button data-r="3" class="lv3"><span class="num">3</span><span class="lbl" data-lbl="3"></span></button>
+    <button data-r="nope" class="nope"><span class="ms">thumb_down</span><span class="lbl">Nah</span></button>
+  </div>
+  <div class="r-timer"><i id="rBar"></i></div>
+</div>
+
+<div class="menu-scrim" id="menuScrim"></div>
+<div class="menu" id="menu"></div>
+<div class="scrim" id="scrim"></div>
+<div class="sheet" id="sheet">
+  <div class="grab"></div>
+  <div class="sh-head"><h2 id="shTitle"></h2><button class="icon-btn" id="shClose"><span class="ms">close</span></button></div>
+  <div class="sh-body" id="shBody"></div>
+</div>
+<div id="snack"></div>
+
+<script>
+/* ---------- storage ---------- */
+const LS={
+  get(k,d){try{const v=localStorage.getItem('ap_'+k);return v==null?d:JSON.parse(v)}catch{return d}},
+  set(k,v){try{localStorage.setItem('ap_'+k,JSON.stringify(v))}catch{}},
+  del(k){try{localStorage.removeItem('ap_'+k)}catch{}}
+};
+const REDIRECT=location.origin+location.pathname;
+const SCOPES='user-read-playback-state user-modify-playback-state user-read-currently-playing playlist-read-private playlist-read-collaborative playlist-modify-private playlist-modify-public';
+const API='https://api.spotify.com/v1';
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+
+let albums=LS.get('albums',[]);          // [{id,uri,name,artist,image,total,pos,doneCount}]
+let ratings=LS.get('ratings',{});        // uri -> 'nope'|1|2|3
+let playlists=LS.get('playlists',{});    // level -> {id,name}
+let synced=LS.get('synced2',{});         // 'playlistId|uri' -> true
+let ops=LS.get('ops',[]);                // [{op:'add'|'del',pl,uri}] waiting to sync
+let settings=LS.get('settings',{timeout:20});
+let session=LS.get('session',null);      // {albumId,uris,lastUri,maxProg,rated:{}}
+let trackInfo={};                         // uri -> {name,artists,image}
+const LEVEL_HINT={1:'Around anyone',2:'Around some people',3:'Just me'};
+const isLevel=v=>v===1||v===2||v===3;
+const levelName=l=>playlists[l]?.name||LEVEL_HINT[l];
+const saveAll=()=>{LS.set('albums',albums);LS.set('ratings',ratings);LS.set('playlists',playlists);LS.set('synced2',synced);LS.set('ops',ops);LS.set('settings',settings);LS.set('session',session)};
+
+/* ---------- ui helpers ---------- */
+let snackT;
+function snack(msg){const s=$('#snack');s.textContent=msg;s.classList.add('on');clearTimeout(snackT);snackT=setTimeout(()=>s.classList.remove('on'),3000)}
+function show(id){document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===id));if(id==='player')wake(true);else wake(false);window.scrollTo(0,0)}
+function openSheet(title,html){$('#shTitle').textContent=title;$('#shBody').innerHTML=html;$('#scrim').classList.add('on');$('#sheet').classList.add('on')}
+function closeSheet(){$('#scrim').classList.remove('on');$('#sheet').classList.remove('on')}
+$('#scrim').onclick=closeSheet;$('#shClose').onclick=closeSheet;
+
+let wakeLock=null;
+async function wake(on){
+  try{
+    if(on&&!wakeLock&&'wakeLock' in navigator){wakeLock=await navigator.wakeLock.request('screen');wakeLock.addEventListener('release',()=>wakeLock=null)}
+    if(!on&&wakeLock){await wakeLock.release();wakeLock=null}
+  }catch{}
+}
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible'){if($('#player').classList.contains('on'))wake(true);poll()}});
+
+/* Material You: tint the whole UI from album art */
+function tintFrom(url){
+  if(!url)return;
+  const img=new Image();img.crossOrigin='anonymous';
+  img.onload=()=>{try{
+    const c=document.createElement('canvas');c.width=c.height=24;const x=c.getContext('2d');x.drawImage(img,0,0,24,24);
+    const d=x.getImageData(0,0,24,24).data;let sx=0,sy=0,w=0;
+    for(let i=0;i<d.length;i+=4){const r=d[i]/255,g=d[i+1]/255,b=d[i+2]/255,mx=Math.max(r,g,b),mn=Math.min(r,g,b),s=mx-mn;if(s<.12||mx<.15)continue;
+      let h;if(mx===r)h=((g-b)/s)%6;else if(mx===g)h=(b-r)/s+2;else h=(r-g)/s+4;h*=60;const a=h*Math.PI/180;sx+=Math.cos(a)*s;sy+=Math.sin(a)*s;w+=s}
+    if(w>0){let h=Math.atan2(sy,sx)*180/Math.PI;if(h<0)h+=360;document.documentElement.style.setProperty('--h',Math.round(h))}
+  }catch{}};img.src=url;
+}
+
+/* ---------- auth (PKCE) ---------- */
+function rand(n){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';return Array.from(crypto.getRandomValues(new Uint8Array(n)),x=>c[x%c.length]).join('')}
+async function challenge(v){const h=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v));return btoa(String.fromCharCode(...new Uint8Array(h))).replace(/=/g,'').replace(/\+/g,'-').replace(/\//g,'_')}
+async function login(){
+  const cid=LS.get('clientId');if(!cid)return;
+  const v=rand(64);LS.set('verifier',v);
+  location.href='https://accounts.spotify.com/authorize?'+new URLSearchParams({response_type:'code',client_id:cid,scope:SCOPES,code_challenge_method:'S256',code_challenge:await challenge(v),redirect_uri:REDIRECT});
+}
+async function tokenReq(params){
+  const r=await fetch('https://accounts.spotify.com/api/token',{method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({client_id:LS.get('clientId'),...params})});
+  const j=await r.json();if(!r.ok)throw new Error(j.error_description||j.error||'Auth failed');
+  const old=LS.get('token',{});
+  LS.set('token',{access:j.access_token,refresh:j.refresh_token||old.refresh,exp:Date.now()+j.expires_in*1000});
+}
+async function handleRedirect(){
+  const p=new URLSearchParams(location.search);
+  if(p.get('error')){snack('Spotify login cancelled');history.replaceState({},'',REDIRECT);return}
+  const code=p.get('code');if(!code)return;
+  history.replaceState({},'',REDIRECT);
+  try{await tokenReq({grant_type:'authorization_code',code,redirect_uri:REDIRECT,code_verifier:LS.get('verifier')})}
+  catch(e){snack(e.message)}
+}
+let refreshing=null;
+async function token(force){
+  const t=LS.get('token');if(!t)throw new Error('Not logged in');
+  if(!force&&t.exp-60000>Date.now())return t.access;
+  refreshing??=tokenReq({grant_type:'refresh_token',refresh_token:t.refresh}).finally(()=>refreshing=null);
+  await refreshing;return LS.get('token').access;
+}
+
+/* ---------- API ---------- */
+async function api(path,{method='GET',body,retry=true}={}){
+  const url=path.startsWith('http')?path:API+path;
+  const r=await fetch(url,{method,headers:{Authorization:'Bearer '+await token(),...(body?{'Content-Type':'application/json'}:{})},body:body?JSON.stringify(body):undefined});
+  if(r.status===401&&retry){await token(true);return api(path,{method,body,retry:false})}
+  if(r.status===429&&retry){await sleep((+r.headers.get('Retry-After')||2)*1000);return api(path,{method,body,retry:false})}
+  const txt=await r.text();let j=null;try{j=txt?JSON.parse(txt):null}catch{}
+  if(!r.ok){const e=new Error(j?.error?.message||('Error '+r.status));e.status=r.status;e.reason=j?.error?.reason;throw e}
+  return j;
+}
+
+/* ---------- home ---------- */
+let homeTab='todo';
+const fmtDate=t=>t?new Date(t).toLocaleDateString(undefined,{day:'numeric',month:'short',year:'numeric'}):'';
+function renderHome(){
+  const g=$('#albumGrid');
+  const todo=albums.filter(a=>!a.finished).length,done=albums.length-todo;
+  $('#homeTabs').innerHTML=`<button data-tab="todo" class="${homeTab==='todo'?'on':''}">To listen${todo?` · ${todo}`:''}</button><button data-tab="done" class="${homeTab==='done'?'on':''}">Listened${done?` · ${done}`:''}</button>`;
+  let list=albums.map((a,i)=>({a,i})).filter(({a})=>homeTab==='done'?a.finished:!a.finished);
+  if(homeTab==='done')list.sort((x,y)=>(y.a.listenedAt||0)-(x.a.listenedAt||0));
+  if(!list.length){
+    g.style.display='block';
+    g.innerHTML=homeTab==='done'
+      ?`<div class="empty"><span class="ms">library_music</span><p>Nothing here yet.<br>Albums you finish, or mark as listened, show up here.</p></div>`
+      :`<div class="empty"><span class="ms">album</span><p>${done?'All caught up!':'No albums yet.'}<br>Tap <b>Add album</b> to build your listening list.</p></div>`;
+  }else{
+    g.style.display='';
+    g.innerHTML=list.map(({a,i})=>{
+      const kept=(a.trackUris||[]).filter(u=>isLevel(ratings[u])).length;
+      return `<div class="album" role="button" tabindex="0" data-i="${i}"><img src="${esc(a.image)}" alt="" loading="lazy">
+      <button class="more" data-more="${i}" aria-label="More options"><span class="ms">more_vert</span></button>
+      <b>${esc(a.name)}</b><small>${esc(a.artist)}</small>
+      <div class="chips">${a.finished?`<span class="chip done"><span class="ms">check</span>${a.listenedAt?fmtDate(a.listenedAt):'Listened'}</span>`:a.pos?`<span class="chip">${a.pos+1}/${a.total}</span>`:`<span class="chip">${a.total} songs</span>`}
+      ${kept?`<span class="chip"><span class="ms fill">favorite</span>${kept}</span>`:''}</div></div>`}).join('');
+  }
+  const a=session&&albums.find(x=>x.id===session.albumId);
+  $('#nowBar').hidden=!a;
+  if(a){$('#nbImg').src=a.image;$('#nbTitle').textContent=a.name}
+}
+$('#albumGrid').onclick=e=>{
+  const m=e.target.closest('[data-more]');if(m){e.stopPropagation();openMenu(+m.dataset.more,m);return}
+  const b=e.target.closest('.album');if(b)albumSheet(+b.dataset.i)};
+$('#homeTabs').onclick=e=>{const b=e.target.closest('[data-tab]');if(!b)return;homeTab=b.dataset.tab;renderHome()};
+
+function setListened(a,on){
+  a.finished=on;a.pos=0;a.listenedAt=on?Date.now():undefined;
+  saveAll();renderHome();
+}
+function openMenu(i,anchor){
+  const a=albums[i],menu=$('#menu');
+  menu.innerHTML=`
+    <button data-m="listened"><span class="ms">${a.finished?'replay':'done_all'}</span>${a.finished?'Mark as not listened':'Mark as listened'}</button>
+    <button data-m="delete" class="danger"><span class="ms">delete</span>Delete</button>`;
+  menu.classList.add('on');$('#menuScrim').classList.add('on');
+  const r=anchor.getBoundingClientRect(),w=menu.offsetWidth,h=menu.offsetHeight;
+  let left=Math.min(r.right-w,innerWidth-w-8),top=r.bottom+6;
+  if(top+h>innerHeight-8)top=r.top-h-6;
+  menu.style.left=Math.max(8,left)+'px';menu.style.top=Math.max(8,top)+'px';
+  menu.onclick=e=>{const b=e.target.closest('[data-m]');if(!b)return;closeMenu();
+    if(b.dataset.m==='listened'){
+      const was=a.finished;setListened(a,!was);
+      snack(was?`“${a.name}” moved to To listen`:`“${a.name}” marked as listened`);
+    }else{
+      if(session?.albumId===a.id){snack('Stop this album before deleting it');return}
+      albums.splice(i,1);saveAll();renderHome();
+      snack(`Deleted “${a.name}”`);
+    }
+  };
+}
+function closeMenu(){$('#menu').classList.remove('on');$('#menuScrim').classList.remove('on')}
+$('#menuScrim').onclick=closeMenu;
+$('#nowBar').onclick=()=>show('player');
+
+function albumSheet(i){
+  const a=albums[i];
+  openSheet(a.name,`
+    <div class="list-item" style="pointer-events:none"><img src="${esc(a.image)}" alt=""><div class="t"><b>${esc(a.name)}</b><small>${esc(a.artist)} · ${a.total} songs</small></div></div>
+    ${a.pos&&!a.finished?`<button class="list-item" data-act="resume"><div class="ic"><span class="ms fill">play_arrow</span></div><div class="t"><b>Resume</b><small>From song ${a.pos+1}</small></div></button>`:''}
+    <button class="list-item" data-act="start"><div class="ic"><span class="ms fill">${a.pos&&!a.finished?'replay':'play_arrow'}</span></div><div class="t"><b>${a.pos||a.finished?'Play from the start':'Play album'}</b><small>In order, rate each song</small></div></button>
+    <button class="list-item" data-act="remove"><div class="ic"><span class="ms">delete</span></div><div class="t"><b>Remove from list</b><small>Your likes stay in the playlist</small></div></button>`);
+  $('#shBody').onclick=e=>{const b=e.target.closest('[data-act]');if(!b)return;closeSheet();
+    const act=b.dataset.act;
+    if(act==='remove'){albums.splice(i,1);saveAll();renderHome()}
+    else playAlbum(a,act==='resume'?a.pos:0);
+  };
+}
+
+/* ---------- search ---------- */
+$('#addBtn').onclick=()=>{
+  openSheet('Add album',`<label class="field"><span>Search albums or artists</span><input id="q" type="search" autocomplete="off" enterkeyhint="search"></label><div id="res"></div>`);
+  const q=$('#q');setTimeout(()=>q.focus(),300);let t;
+  q.oninput=()=>{clearTimeout(t);t=setTimeout(()=>search(q.value.trim()),400)};
+};
+let lastResults=[];
+async function search(q){
+  const res=$('#res');if(!q){res.innerHTML='';return}
+  res.innerHTML='<div class="spin"></div>';
+  try{
+    const j=await api('/search?'+new URLSearchParams({q,type:'album',limit:10}));
+    lastResults=j.albums.items.filter(Boolean);
+    const row=(a,i)=>{const have=albums.find(x=>x.id===a.id),heard=have?.finished;
+      return `<button class="list-item ${heard?'faded':''}" data-i="${i}"><img src="${esc(a.images?.[1]?.url||a.images?.[0]?.url)}" alt=""><div class="t"><b>${esc(a.name)}</b><small>${heard?'Listened'+(have.listenedAt?' '+fmtDate(have.listenedAt):'')+' · ':''}${esc(a.artists.map(x=>x.name).join(', '))} · ${(a.release_date||'').slice(0,4)} · ${a.total_tracks} songs</small></div><span class="ms" style="color:var(--primary)">${heard?'history':have?'check_circle':'add_circle'}</span></button>`};
+    const draw=()=>res.innerHTML=lastResults.map(row).join('')||'<p class="empty">Nothing found</p>';
+    draw();
+    res.onclick=e=>{const b=e.target.closest('[data-i]');if(!b)return;const a=lastResults[+b.dataset.i];
+      const have=albums.find(x=>x.id===a.id);
+      if(have?.finished){setListened(have,false);homeTab='todo';renderHome();draw();snack('Moved back to To listen');return}
+      if(have){snack('Already in your list');return}
+      albums.push({id:a.id,uri:a.uri,name:a.name,artist:a.artists.map(x=>x.name).join(', '),image:a.images?.[0]?.url,total:a.total_tracks,pos:0});
+      saveAll();renderHome();b.querySelector('.ms:last-child').textContent='check_circle';snack('Added “'+a.name+'”');
+    };
+  }catch(e){res.innerHTML=`<p class="empty">${esc(e.message)}</p>`}
+}
+
+/* ---------- playlist choice ---------- */
+let me=null;
+async function choosePlaylist(level,then){
+  openSheet(`Level ${level} playlist`,'<div class="spin"></div>');
+  try{
+    me??=await api('/me');
+    let items=[],url='/me/playlists?limit=50';
+    while(url&&items.length<200){const j=await api(url);items.push(...j.items.filter(Boolean));url=j.next}
+    const mine=items.filter(p=>p.owner?.id===me.id||p.collaborative);
+    const cur=playlists[level];
+    $('#shBody').innerHTML=`
+      <p style="color:var(--text2);margin:0 4px 8px">${level===1?'Songs you can play around most people. Rating 1 also adds to levels 2 and 3.':level===2?'Rating 2 adds here and to level 3.':'Your weirdest picks. Every kept song lands here.'}</p>
+      <label class="field"><span>New playlist</span><input id="npName" value="Album picks ${level}"></label>
+      <button class="btn tonal" id="npBtn"><span class="ms">add</span>Create playlist</button>
+      <div class="sec-title">Or use one of yours</div>
+      ${mine.map((p,i)=>`<button class="list-item ${cur?.id===p.id?'sel':''}" data-i="${i}">${p.images?.[0]?.url?`<img src="${esc(p.images[0].url)}" alt="">`:`<div class="ic"><span class="ms">queue_music</span></div>`}<div class="t"><b>${esc(p.name)}</b><small>${p.public?'Public':'Private'}</small></div></button>`).join('')}`;
+    const pick=p=>{
+      playlists[level]={id:p.id,name:p.name};
+      // backfill songs already rated at this level or lower
+      for(const [uri,v] of Object.entries(ratings))if(isLevel(v)&&v<=level&&!synced[p.id+'|'+uri]&&!ops.some(o=>o.pl===p.id&&o.uri===uri))ops.push({op:'add',pl:p.id,uri});
+      saveAll();closeSheet();snack(`Level ${level} → “${p.name}”`);renderLabels();flushOps();then&&then()};
+    $('#npBtn').onclick=async()=>{const name=$('#npName').value.trim()||'Album picks '+level;
+      try{const p=await api('/me/playlists',{method:'POST',body:{name,public:false,description:`Album picks, level ${level} (${LEVEL_HINT[level].toLowerCase()})`}});pick(p)}catch(e){snack(e.message)}};
+    $('#shBody').onclick=e=>{const b=e.target.closest('[data-i]');if(b)pick(mine[+b.dataset.i])};
+  }catch(e){$('#shBody').innerHTML=`<p class="empty">${esc(e.message)}</p>`}
+}
+
+/* ---------- playback ---------- */
+async function getDevice(){
+  const {devices=[]}=await api('/me/player/devices')||{};
+  return devices.find(d=>d.is_active&&!d.is_restricted)||devices.find(d=>d.type==='Smartphone')||devices.find(d=>!d.is_restricted);
+}
+async function playAlbum(a,pos=0){
+  const missing=[1,2,3].find(l=>!playlists[l]);
+  if(missing){choosePlaylist(missing,()=>playAlbum(a,pos));return}
+  show('player');setStatus('Starting…');tintFrom(a.image);
+  try{
+    const al=await api('/albums/'+a.id);
+    let tracks=[...al.tracks.items],next=al.tracks.next;
+    while(next){const j=await api(next);tracks.push(...j.items);next=j.next}
+    const img=al.images?.[0]?.url||a.image;
+    tracks.forEach(t=>trackInfo[t.uri]={name:t.name,artists:t.artists.map(x=>x.name).join(', '),image:img,dur:t.duration_ms});
+    a.trackUris=tracks.map(t=>t.uri);a.total=tracks.length;if(pos>=tracks.length)pos=0;
+    const dev=await getDevice();
+    if(!dev){setStatus('');noDevice(a,pos);return}
+    await api(`/me/player/play?device_id=${dev.id}`,{method:'PUT',body:{context_uri:a.uri,offset:{position:pos},position_ms:0}});
+    api(`/me/player/shuffle?state=false&device_id=${dev.id}`,{method:'PUT'}).catch(()=>{});
+    api(`/me/player/repeat?state=off&device_id=${dev.id}`,{method:'PUT'}).catch(()=>{});
+    session={albumId:a.id,uris:a.trackUris,lastUri:null,maxProg:0,rated:{},info:trackInfo};
+    a.pos=pos;saveAll();renderHome();
+    $('#pAlbum').textContent=a.name.toUpperCase();
+    setStatus('');startPolling();
+  }catch(e){setStatus(e.status===404?'Spotify app not ready — open it and try again':e.message)}
+}
+function noDevice(a,pos){
+  openSheet('Open Spotify first',`<p style="color:var(--text2);line-height:1.5;margin-top:0">I control the Spotify app, so it needs to be awake. Open Spotify on this phone, play anything for a second, then come back.</p>
+  <div class="row-btns"><a class="btn tonal" href="spotify:" style="text-decoration:none"><span class="ms">open_in_new</span>Open Spotify</a><button class="btn filled" id="retryBtn">Try again</button></div>`);
+  $('#retryBtn').onclick=()=>{closeSheet();playAlbum(a,pos)};
+}
+function setStatus(t){$('#pStatus').textContent=t}
+
+let pollT=null,lastState=null;
+function startPolling(){clearInterval(pollT);poll();pollT=setInterval(poll,2500)}
+function stopPolling(){clearInterval(pollT);pollT=null}
+
+async function poll(){
+  if(!session)return;
+  if(session.info)Object.assign(trackInfo,session.info);
+  let st;
+  try{st=await api('/me/player');setStatus('')}catch(e){setStatus('Connection lost — retrying…');return}
+  lastState=st;
+  const s=session,item=st?.item,lastIdx=s.uris.length-1;
+
+  if(item&&item.uri!==s.lastUri){
+    // song changed → rate the one that just finished
+    if(s.lastUri&&s.uris.includes(s.lastUri))askRate(s.lastUri);
+    if(!s.uris.includes(item.uri)){
+      // Spotify moved past the album (autoplay) or user started something else
+      const finished=s.lastUri===s.uris[lastIdx];
+      if(finished){try{await api('/me/player/pause',{method:'PUT'})}catch{}}
+      endSession(finished);return;
+    }
+    s.lastUri=item.uri;s.maxProg=0;
+    const a=albums.find(x=>x.id===s.albumId);if(a){a.pos=s.uris.indexOf(item.uri);saveAll()}
+    renderNow(item);
+  }
+  if(item&&item.uri===s.lastUri)s.maxProg=Math.max(s.maxProg,st.progress_ms||0);
+
+  // album ended and Spotify just stopped on the last song
+  const lastInfo=trackInfo[s.lastUri];
+  if(s.lastUri===s.uris[lastIdx]&&(!st||!st.is_playing)&&lastInfo&&s.maxProg>lastInfo.dur-12000){
+    askRate(s.lastUri);endSession(true);return;
+  }
+  if(item){
+    $('#pProg').style.width=(100*(st.progress_ms||0)/item.duration_ms)+'%';
+    $('#playIc').textContent=st.is_playing?'pause':'play_arrow';
+  }
+  LS.set('session',s);
+}
+function renderNow(item){
+  const info=trackInfo[item.uri]||{name:item.name,artists:item.artists.map(x=>x.name).join(', '),image:item.album?.images?.[0]?.url};
+  $('#pTitle').textContent=info.name;$('#pArtist').textContent=info.artists;
+  if($('#pCover').src!==info.image){$('#pCover').src=info.image;tintFrom(info.image)}
+  updateRateRow();
+}
+function updateRateRow(){
+  const v=session?ratings[session.lastUri]:undefined;
+  document.querySelectorAll('#rateRow button').forEach(b=>{const r=b.dataset.r==='nope'?'nope':+b.dataset.r;b.classList.toggle('on',r===v)});
+}
+function renderLabels(){document.querySelectorAll('[data-lbl]').forEach(e=>e.textContent=levelName(+e.dataset.lbl))}
+function endSession(finished){
+  const a=session&&albums.find(x=>x.id===session.albumId);
+  if(a&&finished){a.finished=true;a.pos=0;a.listenedAt=Date.now()}
+  stopPolling();session=null;saveAll();renderHome();
+  if(finished&&a){
+    const n=a.trackUris.filter(u=>isLevel(ratings[u])).length;
+    snack(`Album done — you kept ${n} of ${a.total}`);
+  }
+  // stay on rating overlay if open; go home underneath
+  show('home');
+}
+
+/* controls */
+async function ctl(method,path){try{await api(path,{method});setTimeout(poll,500)}catch(e){snack(e.status===404?'Open the Spotify app':e.message)}}
+$('#playBtn').onclick=()=>ctl('PUT',lastState?.is_playing?'/me/player/pause':'/me/player/play');
+$('#nextBtn').onclick=()=>{if(session?.lastUri&&!ratings[session.lastUri]){session.rated[session.lastUri]=1}ctl('POST','/me/player/next')};
+$('#prevBtn').onclick=()=>{if(session?.lastUri)session.rated[session.lastUri]=1;ctl('POST','/me/player/previous')};
+$('#rateRow').onclick=e=>{const b=e.target.closest('[data-r]');if(!b||!session?.lastUri)return;
+  const u=session.lastUri;session.rated[u]=1;setRating(u,b.dataset.r==='nope'?'nope':+b.dataset.r)};
+$('#backBtn').onclick=()=>{renderHome();show('home')};
+$('#stopBtn').onclick=async()=>{try{await api('/me/player/pause',{method:'PUT'})}catch{}endSession(false)};
+
+/* ---------- rating ---------- */
+let rateQueue=[],rateCur=null,rateTimer=null;
+function askRate(uri){
+  if(!session||session.rated[uri])return;
+  session.rated[uri]=1;
+  if(rateCur===uri||rateQueue.includes(uri))return;
+  rateQueue.push(uri);if(!rateCur)nextRate();
+}
+function nextRate(){
+  clearTimeout(rateTimer);
+  rateCur=rateQueue.shift()||null;
+  const o=$('#rate');
+  if(!rateCur){o.classList.remove('on');return}
+  const info=trackInfo[rateCur]||{};
+  $('#rTitle').textContent=info.name||'Last song';$('#rImg').src=info.image||'';
+  o.classList.add('on');
+  const bar=$('#rBar');bar.style.transition='none';bar.style.width='100%';
+  if(settings.timeout){
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{bar.style.transition=`width ${settings.timeout}s linear`;bar.style.width='0%'}));
+    rateTimer=setTimeout(nextRate,settings.timeout*1000); // no answer = no change
+  }else bar.style.width='0%';
+}
+$('#rBtns').onclick=e=>{const b=e.target.closest('[data-r]');if(!b)return;
+  if(rateCur){const v=b.dataset.r==='nope'?'nope':+b.dataset.r;setRating(rateCur,v);navigator.vibrate?.(v==='nope'?20:40)}
+  nextRate()};
+
+/* Rating N adds the song to playlists N..3 and removes it from the others */
+function setRating(uri,val){
+  ratings[uri]=val;
+  const want=new Set(isLevel(val)?[1,2,3].filter(l=>l>=val).map(l=>playlists[l]?.id).filter(Boolean):[]);
+  const ids=new Set([1,2,3].map(l=>playlists[l]?.id).filter(Boolean));
+  for(const id of ids){
+    const k=id+'|'+uri;
+    ops=ops.filter(o=>!(o.pl===id&&o.uri===uri));
+    if(want.has(id)&&!synced[k])ops.push({op:'add',pl:id,uri});
+    else if(!want.has(id)&&synced[k])ops.push({op:'del',pl:id,uri});
+  }
+  saveAll();flushOps();updateRateRow();renderHome();
+  snack(isLevel(val)?`Level ${val} → added to ${want.size} playlist${want.size===1?'':'s'}`:'Not kept');
+}
+let flushing=false;
+async function flushOps(){
+  if(flushing||!ops.length)return;
+  flushing=true;
+  try{
+    while(ops.length){
+      const {op,pl}=ops[0];
+      const batch=ops.filter(o=>o.op===op&&o.pl===pl).slice(0,100);
+      const uris=batch.map(o=>o.uri);
+      if(op==='add')await api(`/playlists/${pl}/items`,{method:'POST',body:{uris}});
+      else await api(`/playlists/${pl}/items`,{method:'DELETE',body:{items:uris.map(uri=>({uri}))}});
+      uris.forEach(u=>{const k=pl+'|'+u;if(op==='add')synced[k]=true;else delete synced[k]});
+      ops=ops.filter(o=>!batch.includes(o));saveAll();
+    }
+  }catch(e){
+    if(e.status===404||e.status===403)snack('Couldn’t update a playlist — check Settings');
+    setTimeout(flushOps,15000);
+  }
+  flushing=false;
+}
+
+/* ---------- settings ---------- */
+$('#settingsBtn').onclick=()=>{
+  const count=l=>Object.values(ratings).filter(v=>isLevel(v)&&v<=l).length;
+  openSheet('Settings',`
+    <div class="sec-title">Playlists${ops.length?` · ${ops.length} changes waiting to sync`:''}</div>
+    ${[1,2,3].map(l=>`<button class="list-item" data-pl="${l}"><div class="lv-dot lv${l} on">${l}</div><div class="t"><b>${esc(playlists[l]?.name||'Not chosen')}</b><small>${LEVEL_HINT[l]} · ${count(l)} songs</small></div><span class="ms">chevron_right</span></button>`).join('')}
+    <div class="sec-title">Like screen closes after</div>
+    <div class="seg" id="sTo">${[10,20,30,0].map(v=>`<button data-v="${v}" class="${settings.timeout===v?'on':''}">${v?v+' sec':'Never'}</button>`).join('')}</div>
+    <div class="sec-title">Data</div>
+    <div class="row-btns">
+      <button class="btn tonal" id="sExp"><span class="ms">download</span>Export</button>
+      <button class="btn tonal" id="sImp"><span class="ms">upload</span>Import</button>
+    </div>
+    <div class="sec-title">Account</div>
+    <div class="row-btns"><button class="btn text" id="sOut"><span class="ms">logout</span>Disconnect Spotify</button></div>
+    <input type="file" id="sFile" accept="application/json" hidden>`);
+  document.querySelectorAll('[data-pl]').forEach(b=>b.onclick=()=>choosePlaylist(+b.dataset.pl));
+  $('#sTo').onclick=e=>{const b=e.target.closest('[data-v]');if(!b)return;settings.timeout=+b.dataset.v;saveAll();$('#sTo').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b))};
+  $('#sExp').onclick=()=>{const blob=new Blob([JSON.stringify({albums,ratings,synced,settings,playlists},null,1)],{type:'application/json'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='album-picker-backup.json';a.click()};
+  $('#sImp').onclick=()=>$('#sFile').click();
+  $('#sFile').onchange=async e=>{try{const d=JSON.parse(await e.target.files[0].text());albums=d.albums||albums;ratings=d.ratings||ratings;synced=d.synced||synced;settings=d.settings||settings;playlists=d.playlists||playlists;saveAll();renderHome();renderLabels();closeSheet();snack('Imported')}catch{snack('That file didn’t work')}};
+  $('#sOut').onclick=()=>{LS.del('token');stopPolling();session=null;saveAll();closeSheet();boot()};
+};
+
+/* ---------- setup ---------- */
+$('#redirShow').textContent=REDIRECT;
+document.addEventListener('click',e=>{const b=e.target.closest('[data-copy]');if(b){navigator.clipboard?.writeText(REDIRECT).then(()=>snack('Copied'),()=>snack('Copy failed — select it manually'))}});
+$('#cidInput').value=LS.get('clientId','');
+$('#connectBtn').onclick=()=>{const v=$('#cidInput').value.trim();if(!/^[0-9a-f]{32}$/i.test(v)){snack('That doesn’t look like a Client ID (32 characters)');return}LS.set('clientId',v);login()};
+
+/* ---------- boot ---------- */
+async function boot(){
+  await handleRedirect();
+  if(!LS.get('clientId')||!LS.get('token')){show('setup');return}
+  renderHome();
+  if(session){
+    Object.assign(trackInfo,session.info||{});
+    const a=albums.find(x=>x.id===session.albumId);
+    if(a){$('#pAlbum').textContent=a.name.toUpperCase();tintFrom(a.image);show('player');startPolling()}
+    else{session=null;saveAll();show('home')}
+  }else show('home');
+  renderLabels();flushOps();
+}
+boot();
+</script>
+</body>
+</html>

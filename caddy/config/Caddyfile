@@ -10,6 +10,19 @@ secret.itayvak.com {
 #}
 
 notes.itayvak.com {
+    # Android launches an installed PWA as a cross-site navigation, which SiYuan rejects.
+    # Allow that for the app's entry pages only; API requests stay protected.
+    # TODO: delete this block once SiYuan is on v3.8.7 or later, which fixes it upstream
+    # (https://github.com/siyuan-note/siyuan/issues/20058).
+    @pwa_launch {
+        method GET
+        path / /stage/build/app/ /stage/build/desktop/ /stage/build/mobile/
+        header Sec-Fetch-Site cross-site
+        header Sec-Fetch-Mode navigate
+        header Sec-Fetch-Dest document
+    }
+    request_header @pwa_launch Sec-Fetch-Site none
+
     reverse_proxy siyuan:6806
 }
 
@@ -31,4 +44,53 @@ docs.itayvak.com {
 
 monitoring.itayvak.com {
     reverse_proxy beszel:8090
+}
+
+albums.itayvak.com {
+    reverse_proxy album-player:80
+}
+
+# ---- Remote Chromium (WhatsApp Web from work), see chromium/REMOVE.md ----
+
+# Drops requests that didn't come through Cloudflare, and adds security headers.
+# Ranges from https://www.cloudflare.com/ips/ (checked 2026-10-19)
+(cloudflare_only) {
+    @not_cloudflare not remote_ip 173.245.48.0/20 103.21.244.0/22 103.22.200.0/22 103.31.4.0/22 141.101.64.0/18 108.162.192.0/18 190.93.240.0/20 188.114.96.0/20 197.234.240.0/22 198.41.128.0/17 162.158.0.0/15 104.16.0.0/13 104.24.0.0/14 172.64.0.0/13 131.0.72.0/22 2400:cb00::/32 2606:4700::/32 2803:f800::/32 2405:b500::/32 2405:8100::/32 2a06:98c0::/29 2c0f:f248::/32
+    abort @not_cloudflare
+
+    header {
+        Strict-Transport-Security "max-age=31536000"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        -Server
+    }
+}
+
+browser.itayvak.com {
+    # `route` keeps the order as written, so the Cloudflare check runs before anything else
+    route {
+        import cloudflare_only
+
+        # Ask TinyAuth whether the visitor is logged in. If not, it redirects to auth.itayvak.com.
+        # If yes, it returns the container's own credentials, which are copied into the request.
+        forward_auth chromium_tinyauth:3000 {
+            uri /api/auth/caddy
+            header_up X-Forwarded-For {http.request.header.Cf-Connecting-Ip}
+            copy_headers Authorization
+        }
+
+        reverse_proxy chromium:3000
+    }
+}
+
+# TinyAuth login page for browser.itayvak.com
+auth.itayvak.com {
+    route {
+        import cloudflare_only
+
+        reverse_proxy chromium_tinyauth:3000 {
+            header_up X-Forwarded-For {http.request.header.Cf-Connecting-Ip}
+        }
+    }
 }

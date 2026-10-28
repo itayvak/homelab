@@ -13,5 +13,7 @@ These are the services I currently have on the homelab:
 | Caddy        | Reverse proxy                                 | None                                                     | No          |
 | Beszel       | Server and container monitoring               | [monitoring.itayvak.com](https://monitoring.itayvak.com) | No          |
 | MkDocs       | Frontend for the documentation                | [docs.itayvak.com](https://docs.itayvak.com)             | No          |
+| Album Player | Spotify album picker (single static page) | [albums.itayvak.com](https://albums.itayvak.com)         | No          |
+| Chromium     | Remote browser, for WhatsApp Web from work (temporary, login at auth.itayvak.com) | [browser.itayvak.com](https://browser.itayvak.com)       | No          |
 
 Backups are described in [Backups](backups/index.md).
