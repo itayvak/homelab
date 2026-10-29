@@ -19,6 +19,9 @@ Nothing was changed in DNS, Cloudflare or the router. The wildcard record alread
 
 ## Steps
 
+0. **Selfie Timelapse uses this TinyAuth too.** `timelapse.itayvak.com` uses the `chromium_tinyauth` container and the `(cloudflare_only)` snippet. Before removing them, either remove Selfie Timelapse too (delete its `timelapse.itayvak.com` block in the Caddyfile and run `docker compose down` in `/apps/deploy/selfie-timelapse`), or move TinyAuth and the snippet somewhere else first. Otherwise the timelapse site is left without a login. If TinyAuth stays, also keep its `/apps/data/tinyauth` and the `TINYAUTH_APPS_TIMELAPSE_*` settings.
+
+
 1. **Unlink WhatsApp first.** On the phone, go to WhatsApp > Settings > Linked devices, tap the Chromium (Linux) session and log out. Deleting the server data does not unlink it, it would stay linked until WhatsApp expires it.
 
 2. **Stop and delete the containers and their images:**

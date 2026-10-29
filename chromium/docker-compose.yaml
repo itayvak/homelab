@@ -50,6 +50,9 @@ services:
       # After login, pass the container's own credentials on to it
       - TINYAUTH_APPS_BROWSER_RESPONSE_BASICAUTH_USERNAME=${CUSTOM_USER}
       - TINYAUTH_APPS_BROWSER_RESPONSE_BASICAUTH_PASSWORD=${PASSWORD}
+      # Selfie Timelapse (selfie-timelapse/) uses this login too
+      - TINYAUTH_APPS_TIMELAPSE_CONFIG_DOMAIN=timelapse.itayvak.com
+      - TINYAUTH_APPS_TIMELAPSE_USERS_ALLOW=itayvak
       - TINYAUTH_ANALYTICS_ENABLED=false
     volumes:
       - /apps/data/tinyauth:/data

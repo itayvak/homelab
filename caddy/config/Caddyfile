@@ -94,3 +94,19 @@ auth.itayvak.com {
         }
     }
 }
+
+# ---- Selfie Timelapse. Uses the TinyAuth login and (cloudflare_only) snippet from the Chromium section above ----
+
+timelapse.itayvak.com {
+    route {
+        import cloudflare_only
+
+        # The app has no login of its own, so TinyAuth guards it
+        forward_auth chromium_tinyauth:3000 {
+            uri /api/auth/caddy
+            header_up X-Forwarded-For {http.request.header.Cf-Connecting-Ip}
+        }
+
+        reverse_proxy selfie-timelapse:5000
+    }
+}

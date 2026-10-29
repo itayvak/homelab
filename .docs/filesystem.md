@@ -61,6 +61,7 @@ Every service in `/apps/deploy/<SERVICE_NAME>` follows these rules:
 | `/apps/storage/backups`               | `itayvak`             | Borg runs as `itayvak`, so it must be able to write here.                    |
 | `/apps/data/siyuan`                   | `itayvak`             | The SiYuan container runs as UID 1000, which is `itayvak`.                   |
 | `/apps/data/chromium`                 | `itayvak`             | The Chromium container runs as UID 1000 (`PUID`/`PGID` in its compose file). |
+| `/apps/data/selfie-timelapse`, `/apps/storage/media/selfie-timelapse` | `itayvak` | The Selfie Timelapse container runs as UID 1000. Config in `data`, generated photos and videos in `storage`. |
 | `/apps/data/tinyauth`                 | `root`                | Session database of the TinyAuth container (`chromium/`), which runs as root. |
 | `/apps/data/planka/app-data`          | `itayvak`             | The Planka container runs as UID 1000, so it needs to write uploads here.    |
 | `/apps/deploy/immich-stack/logs`      | `itayvak`             | The Immich Stack container runs as UID 1000.                                 |

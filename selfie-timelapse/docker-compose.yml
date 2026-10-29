@@ -1,0 +1,24 @@
+services:
+  selfie-timelapse:
+    image: arnaudcayrol/immich-selfie-timelapse:2.3.0
+    container_name: selfie-timelapse
+    restart: unless-stopped
+    user: 1000:1000
+    # No published port: reached through Caddy at timelapse.itayvak.com, behind TinyAuth
+    environment:
+      - IMMICH_API_KEY=${IMMICH_API_KEY}
+      - IMMICH_BASE_URL=http://immich_server:2283
+    volumes:
+      - /apps/data/selfie-timelapse:/app/config
+      - /apps/storage/media/selfie-timelapse:/app/output
+    deploy:
+      resources:
+        limits:
+          cpus: "2"
+          memory: 4g
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

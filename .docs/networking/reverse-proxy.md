@@ -41,7 +41,8 @@ These are the routes in the Caddyfile:
 | `secret.itayvak.com`     | `youaregay:80`      | A joke website                       |
 | `albums.itayvak.com`     | `album-player:80`   | Static Spotify album picker page     |
 | `browser.itayvak.com`    | `chromium:3000`     | See [Remote browser](#remote-browser) |
-| `auth.itayvak.com`       | `chromium_tinyauth:3000` | Login page for the remote browser |
+| `auth.itayvak.com`       | `chromium_tinyauth:3000` | Login page for the remote browser and Selfie Timelapse |
+| `timelapse.itayvak.com`  | `selfie-timelapse:5000` | See [Selfie Timelapse](#selfie-timelapse) |
 
 The Caddyfile also has a commented-out `testing.itayvak.com` block. Uncomment it and point it at a container to try a new app on a temporary address.
 
@@ -70,12 +71,12 @@ The Caddyfile route for Immich is a plain reverse proxy, with no special upload 
 
 - **Login page (TinyAuth).** The work PC's Chrome doesn't show basic auth prompts, so the login is a web page instead: [TinyAuth](https://github.com/tinyauthapp/tinyauth) at `auth.itayvak.com`, running as the `chromium_tinyauth` container in the same compose file. Caddy asks it about every request to `browser.itayvak.com` (`forward_auth`), and sends visitors who aren't logged in to the login page. The login is in `/apps/deploy/chromium/.env`. A session lasts 12 hours. 3 wrong passwords lock the username for 5 minutes.
 - **The container's own login stays on.** I never type it: after login, TinyAuth gives Caddy the container's username and password (`CUSTOM_USER`/`PASSWORD` in `.env`), and Caddy adds them to the request. Other containers on the `homelab` network still can't open the browser without them.
-- **Only `browser.itayvak.com` is allowed.** TinyAuth denies every domain except the ones listed in its `TINYAUTH_APPS_*` settings.
+- **Only listed domains are allowed.** TinyAuth denies every domain except the ones in its `TINYAUTH_APPS_*` settings: `browser.itayvak.com` and `timelapse.itayvak.com`.
 - **Cloudflare only.** Requests that don't come from [Cloudflare's IP ranges](https://www.cloudflare.com/ips/) are dropped, on both subdomains, so nobody can reach them by connecting to the home IP directly. The ranges are in the `(cloudflare_only)` snippet in the Caddyfile. If Cloudflare changes them, the sites stop loading, and the list needs updating.
 - **Everything is inside `route { }`,** so the Cloudflare check runs before anything else. Caddy's default order would run some handlers before `abort`.
 - **Security headers:** HSTS, `X-Frame-Options DENY`, `nosniff`, `no-referrer`.
 
-TinyAuth's session cookie is set on `.itayvak.com`, so the browser also sends it to the other subdomains. It only grants access to `browser.itayvak.com`.
+TinyAuth's session cookie is set on `.itayvak.com`, so the browser also sends it to the other subdomains. It only grants access to the domains listed in its settings (`browser.` and `timelapse.itayvak.com`).
 
 The remote desktop stream is a WebSocket at `/api/websockets`. Caddy and Cloudflare both pass WebSockets through without extra settings.
 
@@ -92,6 +93,20 @@ cd /apps/deploy/chromium && docker compose up -d
 - **PC to server:** upload it in the sidebar. It lands in `Downloads`, where the remote browser's file picker (for example, WhatsApp's attach button) can pick it.
 
 Files stay in `Downloads` until deleted, either from the sidebar or with `rm` on the server. The browser profile (including the WhatsApp login) is in `/apps/data/chromium` and is not backed up. If it is lost, I scan the QR code again.
+
+## Selfie Timelapse
+
+`timelapse.itayvak.com` is [Immich Selfie Timelapse](https://github.com/ArnaudCrl/immich-automated-selfie-timelapse) (`/apps/deploy/selfie-timelapse`). It makes timelapse videos of a person from their Immich photos. The app has no login of its own and shows faces from the whole photo library, so it uses the same protection as the [remote browser](#remote-browser):
+
+- **TinyAuth login** at `auth.itayvak.com`. One login covers both sites, because the session cookie is shared. The domain is allowed with the `TINYAUTH_APPS_TIMELAPSE_*` settings in `chromium/docker-compose.yaml`.
+- **Cloudflare only**, with the same `(cloudflare_only)` snippet and `route { }` block.
+
+The container publishes no port. It talks to Immich directly at `immich_server:2283` on the `homelab` network, with an Immich API key in `/apps/deploy/selfie-timelapse/.env`. Its settings are in `/apps/data/selfie-timelapse`, and the generated photos and videos are in `/apps/storage/media/selfie-timelapse`. Neither is backed up, since everything can be generated again.
+
+It's a one-off tool, so I can stop it with `docker compose down` when I'm not using it. The route then shows a 502 after login.
+
+!!! warning
+    TinyAuth lives in the `chromium/` folder. Removing the remote browser with `chromium/REMOVE.md` would also remove this login, see the note there.
 
 ## Adding a new service
 
