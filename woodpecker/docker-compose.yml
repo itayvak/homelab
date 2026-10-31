@@ -1,0 +1,45 @@
+services:
+  woodpecker-server:
+    image: woodpeckerci/woodpecker-server:v3.20.1
+    user: 1000:1000
+    container_name: woodpecker-server
+    restart: unless-stopped
+    # No published port: the web UI is reached through Caddy at ci.itayvak.com
+    environment:
+      - WOODPECKER_HOST=https://ci.itayvak.com
+      # Log in with GitHub. Only the admin account below may log in.
+      - WOODPECKER_GITHUB=true
+      - WOODPECKER_GITHUB_CLIENT=${WOODPECKER_GITHUB_CLIENT}
+      - WOODPECKER_GITHUB_SECRET=${WOODPECKER_GITHUB_SECRET}
+      - WOODPECKER_ADMIN=itayvak
+      - WOODPECKER_OPEN=false
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+      - WOODPECKER_GRPC_SECRET=${WOODPECKER_GRPC_SECRET}
+    volumes:
+      - /apps/data/woodpecker/server:/var/lib/woodpecker
+    networks:
+      - homelab
+
+  woodpecker-agent:
+    image: woodpeckerci/woodpecker-agent:v3.20.1
+    container_name: woodpecker-agent
+    restart: unless-stopped
+    command: agent
+    depends_on:
+      - woodpecker-server
+    environment:
+      - WOODPECKER_SERVER=woodpecker-server:9000
+      - WOODPECKER_AGENT_SECRET=${WOODPECKER_AGENT_SECRET}
+      - WOODPECKER_BACKEND=docker
+      # How many pipelines can run at the same time
+      - WOODPECKER_MAX_WORKFLOWS=2
+    volumes:
+      # Pipeline steps run as sibling containers on the host's Docker
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /apps/data/woodpecker/agent:/etc/woodpecker
+    networks:
+      - homelab
+
+networks:
+  homelab:
+    external: true

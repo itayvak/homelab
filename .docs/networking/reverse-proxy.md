@@ -43,6 +43,7 @@ These are the routes in the Caddyfile:
 | `browser.itayvak.com`    | `chromium:3000`     | See [Remote browser](#remote-browser) |
 | `auth.itayvak.com`       | `chromium_tinyauth:3000` | Login page for the remote browser and Selfie Timelapse |
 | `timelapse.itayvak.com`  | `selfie-timelapse:5000` | See [Selfie Timelapse](#selfie-timelapse) |
+| `ci.itayvak.com`         | `woodpecker-server:8000` | See [Woodpecker CI](#woodpecker-ci) |
 
 The Caddyfile also has a commented-out `testing.itayvak.com` block. Uncomment it and point it at a container to try a new app on a temporary address.
 
@@ -107,6 +108,19 @@ It's a one-off tool, so I can stop it with `docker compose down` when I'm not us
 
 !!! warning
     TinyAuth lives in the `chromium/` folder. Removing the remote browser with `chromium/REMOVE.md` would also remove this login, see the note there.
+
+## Woodpecker CI
+
+`ci.itayvak.com` is [Woodpecker CI](https://woodpecker-ci.org/) (`/apps/deploy/woodpecker`). It runs pipelines for my GitHub repos. A repo gets a pipeline by adding a `.woodpecker.yml` (or a `.woodpecker/` folder) and enabling the repo in the web UI.
+
+- **Two containers.** `woodpecker-server` is the web UI and API. `woodpecker-agent` connects to it on `woodpecker-server:9000` and runs the pipeline steps, up to 2 pipelines at a time (`WOODPECKER_MAX_WORKFLOWS`).
+- **Login is with GitHub,** through an OAuth app on my GitHub account. Its homepage is `https://ci.itayvak.com` and its callback URL is `https://ci.itayvak.com/authorize`. Only `itayvak` can log in (`WOODPECKER_ADMIN`, with `WOODPECKER_OPEN=false`).
+- **No TinyAuth or Cloudflare-only block.** GitHub sends webhooks to `ci.itayvak.com/api/hook` when I push, and the GitHub login also redirects here, so the route has to be a plain reverse proxy.
+- **Secrets** are in `/apps/deploy/woodpecker/.env`: the OAuth app's client ID and secret, the agent secret that the server and agent share, and the gRPC secret that signs their connection. Without a fixed gRPC secret, the server makes a new one on every restart and the agent loses its connection.
+- **Data** is in `/apps/data/woodpecker/server` (an SQLite database with repos, pipeline history and pipeline secrets). It isn't backed up. If it is lost, I log in again, re-enable the repos and re-enter the pipeline secrets.
+
+!!! warning
+    The agent has the Docker socket mounted, and every pipeline step is a container on the host's Docker. A pipeline can do anything on the server, so I only enable repos I trust. Pull requests from forks need my approval before they run.
 
 ## Adding a new service
 

@@ -63,6 +63,8 @@ Every service in `/apps/deploy/<SERVICE_NAME>` follows these rules:
 | `/apps/data/chromium`                 | `itayvak`             | The Chromium container runs as UID 1000 (`PUID`/`PGID` in its compose file). |
 | `/apps/data/selfie-timelapse`, `/apps/storage/media/selfie-timelapse` | `itayvak` | The Selfie Timelapse container runs as UID 1000. Config in `data`, generated photos and videos in `storage`. |
 | `/apps/data/tinyauth`                 | `root`                | Session database of the TinyAuth container (`chromium/`), which runs as root. |
+| `/apps/data/woodpecker/server`       | `itayvak`             | Woodpecker server database. The server container runs as UID 1000 (`user:` in its compose file). |
+| `/apps/data/woodpecker/agent`        | `root`                | Woodpecker agent ID. The agent container runs as root.                       |
 | `/apps/data/planka/app-data`          | `itayvak`             | The Planka container runs as UID 1000, so it needs to write uploads here.    |
 | `/apps/deploy/immich-stack/logs`      | `itayvak`             | The Immich Stack container runs as UID 1000.                                 |
 | `/apps/data/immich`                   | UID `999`, mode `700` | The Immich PostgreSQL container owns it. Don't change this.                  |

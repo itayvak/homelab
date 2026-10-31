@@ -110,3 +110,8 @@ timelapse.itayvak.com {
         reverse_proxy selfie-timelapse:5000
     }
 }
+
+# Woodpecker CI. Has its own login (GitHub), and GitHub webhooks must reach /api/hook, so no TinyAuth
+ci.itayvak.com {
+    reverse_proxy woodpecker-server:8000
+}
